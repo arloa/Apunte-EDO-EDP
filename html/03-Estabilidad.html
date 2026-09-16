@@ -4,99 +4,50 @@
   <meta charset="utf-8" />
   <meta name="generator" content="pandoc" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
-  <title>Análisis de Estabilidad de los Métodos de Euler</title>
+  <title>An��lisis de Estabilidad de los M��todos de Euler</title>
   <style>
     code{white-space: pre-wrap;}
     span.smallcaps{font-variant: small-caps;}
-    div.columns{display: flex; gap: min(4vw, 1.5em);}
-    div.column{flex: auto; overflow-x: auto;}
+    span.underline{text-decoration: underline;}
+    div.column{display: inline-block; vertical-align: top; width: 50%;}
     div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
-    /* The extra [class] is a hack that increases specificity enough to
-       override a similar rule in reveal.js */
-    ul.task-list[class]{list-style: none;}
-    ul.task-list li input[type="checkbox"] {
-      font-size: inherit;
-      width: 0.8em;
-      margin: 0 0.8em 0.2em -1.6em;
-      vertical-align: middle;
-    }
+    ul.task-list{list-style: none;}
   </style>
   <link rel="stylesheet" href="style.css" />
-  <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
-  <script
-  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"
-  type="text/javascript"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" type="text/javascript"></script>
 </head>
 <body>
 <nav class="chapnav"><a class="prev" href="02-RungeKutta.html">&larr; Métodos de Runge–Kutta</a><a class="index" href="index.html">&Iacute;ndice</a><a class="next" href="04-CondicionesContorno.html">Condiciones de contorno &rarr;</a></nav>
 <nav id="TOC" role="doc-toc">
 <ul>
-<li><a href="#análisis-de-estabilidad-de-los-métodos-de-euler"
-id="toc-análisis-de-estabilidad-de-los-métodos-de-euler">Análisis de
-Estabilidad de los Métodos de Euler</a>
+<li><a href="#análisis-de-estabilidad-de-los-métodos-de-euler">Análisis de Estabilidad de los Métodos de Euler</a>
 <ul>
-<li><a href="#problema-modelo" id="toc-problema-modelo">Problema
-modelo</a></li>
-<li><a href="#euler-hacia-adelante-explícito"
-id="toc-euler-hacia-adelante-explícito">Euler hacia adelante
-(explícito)</a></li>
-<li><a href="#euler-hacia-atrás-implícito"
-id="toc-euler-hacia-atrás-implícito">Euler hacia atrás
-(implícito)</a></li>
-<li><a href="#región-de-estabilidad-absoluta"
-id="toc-región-de-estabilidad-absoluta">Región de estabilidad
-absoluta</a></li>
-<li><a href="#comparación-de-ambos-métodos"
-id="toc-comparación-de-ambos-métodos">Comparación de ambos
-métodos</a></li>
-<li><a href="#ecuaciones-rígidas" id="toc-ecuaciones-rígidas">Ecuaciones
-rígidas</a></li>
+<li><a href="#problema-modelo">Problema modelo</a></li>
+<li><a href="#euler-hacia-adelante-explícito">Euler hacia adelante (explícito)</a></li>
+<li><a href="#euler-hacia-atrás-implícito">Euler hacia atrás (implícito)</a></li>
+<li><a href="#región-de-estabilidad-absoluta">Región de estabilidad absoluta</a></li>
+<li><a href="#comparación-de-ambos-métodos">Comparación de ambos métodos</a></li>
+<li><a href="#ecuaciones-rígidas">Ecuaciones rígidas</a></li>
 </ul></li>
 </ul>
 </nav>
-<h1 id="análisis-de-estabilidad-de-los-métodos-de-euler">Análisis de
-Estabilidad de los Métodos de Euler</h1>
-<p>Un esquema numérico es <strong>estable</strong> si las pequeñas
-perturbaciones (redondeo, errores en los datos) no se amplifican sin
-límite a medida que avanza el cálculo. En Euler hacia adelante la
-estabilidad depende del <strong>tamaño de paso</strong> <span
-class="math inline">\(h\)</span> en relación con la dinámica de la EDO.
-Si <span class="math inline">\(h\)</span> es demasiado grande, la
-solución numérica puede oscilar y diverger aunque la exacta decaiga a
-cero.</p>
+<h1 id="análisis-de-estabilidad-de-los-métodos-de-euler">Análisis de Estabilidad de los Métodos de Euler</h1>
+<p>Un esquema numérico es <strong>estable</strong> si las pequeñas perturbaciones (redondeo, errores en los datos) no se amplifican sin límite a medida que avanza el cálculo. En Euler hacia adelante la estabilidad depende del <strong>tamaño de paso</strong> <span class="math inline">\(h\)</span> en relación con la dinámica de la EDO. Si <span class="math inline">\(h\)</span> es demasiado grande, la solución numérica puede oscilar y diverger aunque la exacta decaiga a cero.</p>
 <hr />
 <h2 id="problema-modelo">Problema modelo</h2>
-<p><span class="math display">\[y&#39; = -\lambda y, \quad \lambda &gt;
-0, \quad y(0) = y_0\]</span></p>
-<p>con solución exacta <span class="math inline">\(y(x) = y_0\,
-e^{-\lambda x}\)</span>, que decae monótonamente a <span
-class="math inline">\(0\)</span>.</p>
+<p><span class="math display">\[y&#39; = -\lambda y, \quad \lambda &gt; 0, \quad y(0) = y_0\]</span></p>
+<p>con solución exacta <span class="math inline">\(y(x) = y_0\, e^{-\lambda x}\)</span>, que decae monótonamente a <span class="math inline">\(0\)</span>.</p>
 <hr />
-<h2 id="euler-hacia-adelante-explícito">Euler hacia adelante
-(explícito)</h2>
-<p>Sustituyendo <span class="math inline">\(f = -\lambda y\)</span> en
-la actualización <span class="math inline">\(y_{n+1} = y_n + h\,f(x_n,
-y_n)\)</span>:</p>
-<p><span class="math display">\[y_{n+1} = y_n + h(-\lambda\,y_n) = y_n(1
-- \lambda h)\]</span></p>
-<p>La recurrencia es geométrica, de factor <span class="math inline">\(1
-- \lambda h\)</span>:</p>
-<p><span class="math display">\[y_n = y_0\,(1 - \lambda
-h)^n\]</span></p>
+<h2 id="euler-hacia-adelante-explícito">Euler hacia adelante (explícito)</h2>
+<p>Sustituyendo <span class="math inline">\(f = -\lambda y\)</span> en la actualización <span class="math inline">\(y_{n+1} = y_n + h\,f(x_n, y_n)\)</span>:</p>
+<p><span class="math display">\[y_{n+1} = y_n + h(-\lambda\,y_n) = y_n(1 - \lambda h)\]</span></p>
+<p>La recurrencia es geométrica, de factor <span class="math inline">\(1 - \lambda h\)</span>:</p>
+<p><span class="math display">\[y_n = y_0\,(1 - \lambda h)^n\]</span></p>
 <h3 id="condición-de-estabilidad">Condición de estabilidad</h3>
-<p>La solución exacta tiende a <span class="math inline">\(0\)</span>,
-así que exigimos lo mismo a la numérica, es decir, <span
-class="math inline">\(\lim_{n \to \infty} y_n = 0\)</span>. Una sucesión
-geométrica <span class="math inline">\(a^n\)</span> tiende a <span
-class="math inline">\(0\)</span> si y solo si <span
-class="math inline">\(|a| &lt; 1\)</span>:</p>
-<p><span class="math display">\[|1 - \lambda h| &lt; 1 \iff -1 &lt; 1 -
-\lambda h &lt; 1 \iff 0 &lt; \lambda h &lt; 2\]</span></p>
-<p>La cota inferior es automática (<span class="math inline">\(\lambda
-&gt; 0\)</span>, <span class="math inline">\(h &gt; 0\)</span>); la
-superior da la <strong>condición de estabilidad</strong>:</p>
-<p><span class="math display">\[\boxed{h &lt;
-\frac{2}{\lambda}}\]</span></p>
+<p>La solución exacta tiende a <span class="math inline">\(0\)</span>, así que exigimos lo mismo a la numérica, es decir, <span class="math inline">\(\lim_{n \to \infty} y_n = 0\)</span>. Una sucesión geométrica <span class="math inline">\(a^n\)</span> tiende a <span class="math inline">\(0\)</span> si y solo si <span class="math inline">\(|a| &lt; 1\)</span>:</p>
+<p><span class="math display">\[|1 - \lambda h| &lt; 1 \iff -1 &lt; 1 - \lambda h &lt; 1 \iff 0 &lt; \lambda h &lt; 2\]</span></p>
+<p>La cota inferior es automática (<span class="math inline">\(\lambda &gt; 0\)</span>, <span class="math inline">\(h &gt; 0\)</span>); la superior da la <strong>condición de estabilidad</strong>:</p>
+<p><span class="math display">\[\boxed{h &lt; \frac{2}{\lambda}}\]</span></p>
 <h3 id="interpretación">Interpretación</h3>
 <table>
 <colgroup>
@@ -115,16 +66,12 @@ superior da la <strong>condición de estabilidad</strong>:</p>
 <tr class="odd">
 <td><span class="math inline">\(0 &lt; \lambda h \le 1\)</span></td>
 <td><span class="math inline">\(0 \le 1 - \lambda h &lt; 1\)</span></td>
-<td>Decae monótonamente a <span class="math inline">\(0\)</span> (en
-<span class="math inline">\(\lambda h = 1\)</span> llega en un
-paso)</td>
+<td>Decae monótonamente a <span class="math inline">\(0\)</span> (en <span class="math inline">\(\lambda h = 1\)</span> llega en un paso)</td>
 </tr>
 <tr class="even">
 <td><span class="math inline">\(1 &lt; \lambda h &lt; 2\)</span></td>
-<td><span class="math inline">\(-1 &lt; 1 - \lambda h &lt;
-0\)</span></td>
-<td>Decae a <span class="math inline">\(0\)</span> pero
-<strong>oscila</strong> de signo en cada paso</td>
+<td><span class="math inline">\(-1 &lt; 1 - \lambda h &lt; 0\)</span></td>
+<td>Decae a <span class="math inline">\(0\)</span> pero <strong>oscila</strong> de signo en cada paso</td>
 </tr>
 <tr class="odd">
 <td><span class="math inline">\(\lambda h = 2\)</span></td>
@@ -134,52 +81,27 @@ paso)</td>
 <tr class="even">
 <td><span class="math inline">\(\lambda h &gt; 2\)</span></td>
 <td><span class="math inline">\(|1 - \lambda h| &gt; 1\)</span></td>
-<td><strong>Inestable</strong>: oscila y crece, <span
-class="math inline">\(y_n \to \infty\)</span></td>
+<td><strong>Inestable</strong>: oscila y crece, <span class="math inline">\(y_n \to \infty\)</span></td>
 </tr>
 </tbody>
 </table>
-<p>Si <span class="math inline">\(h &gt; 2/\lambda\)</span> la solución
-numérica diverge aunque la verdadera decaiga — un artefacto de la
-discretización, no de la física de la EDO.</p>
+<p>Si <span class="math inline">\(h &gt; 2/\lambda\)</span> la solución numérica diverge aunque la verdadera decaiga — un artefacto de la discretización, no de la física de la EDO.</p>
 <figure>
-<img src="figs/euler_estabilidad.png"
-alt="Izquierda: Con λh = 1.5 Euler adelante decae oscilando (la exacta decae monótonamente) y con λh = 2 oscila sin amortiguarse. Derecha: con λh = 2.5 oscila creciendo y diverge" />
-<figcaption aria-hidden="true">Izquierda: Con λh = 1.5 Euler adelante
-decae oscilando (la exacta decae monótonamente) y con λh = 2 oscila sin
-amortiguarse. Derecha: con λh = 2.5 oscila creciendo y
-diverge</figcaption>
+<img src="figs/euler_estabilidad.png" alt="" /><figcaption>Izquierda: Con λh = 1.5 Euler adelante decae oscilando (la exacta decae monótonamente) y con λh = 2 oscila sin amortiguarse. Derecha: con λh = 2.5 oscila creciendo y diverge</figcaption>
 </figure>
 <hr />
 <h2 id="euler-hacia-atrás-implícito">Euler hacia atrás (implícito)</h2>
-<p>Euler hacia atrás evalúa la pendiente en el punto <em>siguiente</em>:
-<span class="math inline">\(y_{n+1} = y_n + h\,f(x_{n+1},
-y_{n+1})\)</span>. Con <span class="math inline">\(f = -\lambda
-y\)</span>, el valor buscado <span
-class="math inline">\(y_{n+1}\)</span> aparece en ambos lados;
-despejando:</p>
-<p><span class="math display">\[y_{n+1} + \lambda h\,y_{n+1} = y_n
-\implies y_{n+1}(1 + \lambda h) = y_n\]</span></p>
+<p>Euler hacia atrás evalúa la pendiente en el punto <em>siguiente</em>: <span class="math inline">\(y_{n+1} = y_n + h\,f(x_{n+1}, y_{n+1})\)</span>. Con <span class="math inline">\(f = -\lambda y\)</span>, el valor buscado <span class="math inline">\(y_{n+1}\)</span> aparece en ambos lados; despejando:</p>
+<p><span class="math display">\[y_{n+1} + \lambda h\,y_{n+1} = y_n \implies y_{n+1}(1 + \lambda h) = y_n\]</span></p>
 <p>De nuevo una recurrencia geométrica:</p>
-<p><span class="math display">\[y_n = \frac{y_0}{(1 + \lambda
-h)^n}\]</span></p>
+<p><span class="math display">\[y_n = \frac{y_0}{(1 + \lambda h)^n}\]</span></p>
 <h3 id="condición-de-estabilidad-1">Condición de estabilidad</h3>
 <p>Como <span class="math inline">\(\lambda h &gt; 0\)</span>,</p>
-<p><span class="math display">\[0 &lt; \frac{1}{1 + \lambda h} &lt;
-1\]</span></p>
-<p>para <strong>todo</strong> paso positivo, y por tanto <span
-class="math inline">\(y_n \to 0\)</span> siempre. Euler hacia atrás es
-<strong>incondicionalmente estable</strong>. Esto no significa que un
-paso grande sea preciso; solo que no produce crecimiento espurio.</p>
+<p><span class="math display">\[0 &lt; \frac{1}{1 + \lambda h} &lt; 1\]</span></p>
+<p>para <strong>todo</strong> paso positivo, y por tanto <span class="math inline">\(y_n \to 0\)</span> siempre. Euler hacia atrás es <strong>incondicionalmente estable</strong>. Esto no significa que un paso grande sea preciso; solo que no produce crecimiento espurio.</p>
 <hr />
-<h2 id="región-de-estabilidad-absoluta">Región de estabilidad
-absoluta</h2>
-<p>Este análisis es el de la <strong>estabilidad absoluta</strong>,
-donde los valores de <span class="math inline">\(\lambda h\)</span> para
-los que una perturbación no crece forman la <strong>región de
-estabilidad</strong> del método. En el eje real, con la convención de
-este capítulo (<span class="math inline">\(y&#39; = -\lambda y\)</span>,
-<span class="math inline">\(\lambda &gt; 0\)</span>):</p>
+<h2 id="región-de-estabilidad-absoluta">Región de estabilidad absoluta</h2>
+<p>Este análisis es el de la <strong>estabilidad absoluta</strong>, donde los valores de <span class="math inline">\(\lambda h\)</span> para los que una perturbación no crece forman la <strong>región de estabilidad</strong> del método. En el eje real, con la convención de este capítulo (<span class="math inline">\(y&#39; = -\lambda y\)</span>, <span class="math inline">\(\lambda &gt; 0\)</span>):</p>
 <table>
 <thead>
 <tr class="header">
@@ -202,16 +124,7 @@ este capítulo (<span class="math inline">\(y&#39; = -\lambda y\)</span>,
 </tr>
 </tbody>
 </table>
-<p>Con la convención <span class="math inline">\(y&#39; = \lambda
-y\)</span> con <span class="math inline">\(\operatorname{Re}\lambda &lt;
-0\)</span> —la de <a href="02-RungeKutta.md">Runge–Kutta</a>— estos
-intervalos se leen <span class="math inline">\(-2 &lt; h\lambda &lt;
-0\)</span>, <span class="math inline">\(h\lambda &lt; 0\)</span> y <span
-class="math inline">\(-2.78 \lesssim h\lambda &lt; 0\)</span>. Euler
-atrás cubre todo el semiplano izquierdo (es <strong>A-estable</strong>).
-La misma noción reaparece como la condición <span
-class="math inline">\(r \le \tfrac{1}{2}\)</span> de FTCS en <a
-href="09-Parabolicas.md">Parabólicas</a>.</p>
+<p>Con la convención <span class="math inline">\(y&#39; = \lambda y\)</span> con <span class="math inline">\(\operatorname{Re}\lambda &lt; 0\)</span> —la de <a href="02-RungeKutta.md">Runge–Kutta</a>— estos intervalos se leen <span class="math inline">\(-2 &lt; h\lambda &lt; 0\)</span>, <span class="math inline">\(h\lambda &lt; 0\)</span> y <span class="math inline">\(-2.78 \lesssim h\lambda &lt; 0\)</span>. Euler atrás cubre todo el semiplano izquierdo (es <strong>A-estable</strong>). La misma noción reaparece como la condición <span class="math inline">\(r \le \tfrac{1}{2}\)</span> de FTCS en <a href="09-Parabolicas.md">Parabólicas</a>.</p>
 <hr />
 <h2 id="comparación-de-ambos-métodos">Comparación de ambos métodos</h2>
 <table>
@@ -230,10 +143,8 @@ href="09-Parabolicas.md">Parabólicas</a>.</p>
 <tbody>
 <tr class="odd">
 <td>Actualización</td>
-<td><span class="math inline">\(y_{n+1} = y_n + h\,f(x_n,
-y_n)\)</span></td>
-<td><span class="math inline">\(y_{n+1} = y_n + h\,f(x_{n+1},
-y_{n+1})\)</span></td>
+<td><span class="math inline">\(y_{n+1} = y_n + h\,f(x_n, y_n)\)</span></td>
+<td><span class="math inline">\(y_{n+1} = y_n + h\,f(x_{n+1}, y_{n+1})\)</span></td>
 </tr>
 <tr class="even">
 <td>Factor de amplificación</td>
@@ -242,15 +153,13 @@ y_{n+1})\)</span></td>
 </tr>
 <tr class="odd">
 <td>Estabilidad</td>
-<td>Condicional: <span class="math inline">\(h &lt;
-\dfrac{2}{\lambda}\)</span></td>
+<td>Condicional: <span class="math inline">\(h &lt; \dfrac{2}{\lambda}\)</span></td>
 <td>Incondicional</td>
 </tr>
 <tr class="even">
 <td>Coste por paso</td>
 <td>Bajo: una evaluación de <span class="math inline">\(f\)</span></td>
-<td>Mayor: resolver una ecuación para <span
-class="math inline">\(y_{n+1}\)</span></td>
+<td>Mayor: resolver una ecuación para <span class="math inline">\(y_{n+1}\)</span></td>
 </tr>
 <tr class="odd">
 <td>Con <span class="math inline">\(h\)</span> grande</td>
@@ -259,98 +168,25 @@ class="math inline">\(y_{n+1}\)</span></td>
 </tr>
 </tbody>
 </table>
-<p>El compromiso es <strong>estabilidad vs. coste</strong>. Euler hacia
-atrás no tiene techo de paso, pero cada paso exige resolver una ecuación
-(o un sistema). Euler adelante se evalúa directamente, a cambio de
-limitar <span class="math inline">\(h\)</span>.</p>
+<p>El compromiso es <strong>estabilidad vs. coste</strong>. Euler hacia atrás no tiene techo de paso, pero cada paso exige resolver una ecuación (o un sistema). Euler adelante se evalúa directamente, a cambio de limitar <span class="math inline">\(h\)</span>.</p>
 <hr />
 <h2 id="ecuaciones-rígidas">Ecuaciones rígidas</h2>
-<p>Un sistema de EDO es <strong>rígido</strong> (<em>stiff</em>) cuando
-conviven dinámicas en escalas temporales muy separadas. Conviven los
-modos rápidos que decaen en seguida y los modos lentos que gobiernan el
-largo plazo. Un integrador explícito se ve obligado a dar pasos
-diminutos solo para mantener estables los modos rápidos, mucho después
-de que estos hayan desaparecido.</p>
-<h3 id="un-ejemplo-canónico-reacciones-consecutivas">Un ejemplo
-canónico: reacciones consecutivas</h3>
-<p>La cadena de reacciones de primer orden <span
-class="math inline">\(y_1 \xrightarrow{k_1} y_2 \xrightarrow{k_2}
-y_3\)</span> con <span class="math inline">\(k_1 = 100 \gg k_2 =
-1\)</span> es el modelo más simple con dos escalas. El reactivo <span
-class="math inline">\(y_1\)</span> se consume en <span
-class="math inline">\(\sim 10^{-2}\)</span> y el intermediario <span
-class="math inline">\(y_2\)</span> se acumula de forma transiente para
-luego decaer en escala <span class="math inline">\(\sim 1\)</span>. Las
-velocidades con las que cambian las concentraciones <span
-class="math inline">\(y_1\)</span> e <span
-class="math inline">\(y_2\)</span> son:</p>
-<p><span class="math display">\[y_1&#39; = -100\,y_1, \qquad y_2&#39; =
-100\,y_1 - y_2, \qquad y_1(0) = 1, \quad y_2(0) = 0\]</span></p>
-<p>La solución exacta de estas ecuaciones es <span
-class="math inline">\(y_1(x) = e^{-100x}\)</span> e <span
-class="math inline">\(y_2(x) = \frac{100}{99}\left(e^{-x} -
-e^{-100x}\right)\)</span>. La concentración <span
-class="math inline">\(y_2\)</span> es <strong>una sola función que
-contiene los dos modos</strong> que sube rápidamente hasta <span
-class="math inline">\(\approx 0.95\)</span> en <span
-class="math inline">\(x \approx 0.05\)</span> y después decae lentamente
-como <span class="math inline">\(e^{-x}\)</span>.</p>
-<h3 id="por-qué-los-métodos-explícitos-fracasan-aquí">Por qué los
-métodos explícitos fracasan aquí</h3>
+<p>Un sistema de EDO es <strong>rígido</strong> (<em>stiff</em>) cuando conviven dinámicas en escalas temporales muy separadas. Conviven los modos rápidos que decaen en seguida y los modos lentos que gobiernan el largo plazo. Un integrador explícito se ve obligado a dar pasos diminutos solo para mantener estables los modos rápidos, mucho después de que estos hayan desaparecido.</p>
+<h3 id="un-ejemplo-canónico-reacciones-consecutivas">Un ejemplo canónico: reacciones consecutivas</h3>
+<p>La cadena de reacciones de primer orden <span class="math inline">\(y_1 \xrightarrow{k_1} y_2 \xrightarrow{k_2} y_3\)</span> con <span class="math inline">\(k_1 = 100 \gg k_2 = 1\)</span> es el modelo más simple con dos escalas. El reactivo <span class="math inline">\(y_1\)</span> se consume en <span class="math inline">\(\sim 10^{-2}\)</span> y el intermediario <span class="math inline">\(y_2\)</span> se acumula de forma transiente para luego decaer en escala <span class="math inline">\(\sim 1\)</span>. Las velocidades con las que cambian las concentraciones <span class="math inline">\(y_1\)</span> e <span class="math inline">\(y_2\)</span> son:</p>
+<p><span class="math display">\[y_1&#39; = -100\,y_1, \qquad y_2&#39; = 100\,y_1 - y_2, \qquad y_1(0) = 1, \quad y_2(0) = 0\]</span></p>
+<p>La solución exacta de estas ecuaciones es <span class="math inline">\(y_1(x) = e^{-100x}\)</span> e <span class="math inline">\(y_2(x) = \frac{100}{99}\left(e^{-x} - e^{-100x}\right)\)</span>. La concentración <span class="math inline">\(y_2\)</span> es <strong>una sola función que contiene los dos modos</strong> que sube rápidamente hasta <span class="math inline">\(\approx 0.95\)</span> en <span class="math inline">\(x \approx 0.05\)</span> y después decae lentamente como <span class="math inline">\(e^{-x}\)</span>.</p>
+<h3 id="por-qué-los-métodos-explícitos-fracasan-aquí">Por qué los métodos explícitos fracasan aquí</h3>
 <p>Euler adelante aplicado al sistema da</p>
-<p><span class="math display">\[y_{1,n+1} = (1 - 100h)\,y_{1,n}, \qquad
-y_{2,n+1} = (1 - h)\,y_{2,n} + 100h\,y_{1,n}\]</span></p>
-<p>La primera recurrencia es la escalar ya estudiada y es estable solo
-si <span class="math inline">\(|1 - 100h| &lt; 1\)</span>, es decir
-<span class="math inline">\(h &lt; 0.02\)</span>. Y si ese factor supera
-1 en módulo, la explosión no se queda en <span
-class="math inline">\(y_1\)</span>, el término <span
-class="math inline">\(100h\,y_{1,n}\)</span> de la segunda ecuación la
-inyecta en <span class="math inline">\(y_2\)</span>. La regla general es
-que en un sistema la condición de estabilidad debe cumplirla
-<strong>cada modo presente</strong>, así que la estabilidad la dicta el
-modo más rápido <span class="math inline">\(h &lt; 2\times
-10^{-2}\)</span>, esto es, <span class="math inline">\(\sim 50\)</span>
-pasos para llegar a <span class="math inline">\(x = 1\)</span> y <span
-class="math inline">\(\sim 500\)</span> para <span
-class="math inline">\(x = 10\)</span>.</p>
-<p>La precisión en <span class="math inline">\(y_2\)</span> pediría
-<span class="math inline">\(h \approx 0.02\)</span> (error del <span
-class="math inline">\(\sim 1\%\)</span>), lo que es apenas el techo de
-estabilidad, y con un <span class="math inline">\(k_1\)</span> mayor el
-techo caería muy por debajo de lo útil. El tamaño de paso lo fija la
-<strong>estabilidad</strong>, no la <strong>precisión</strong>.</p>
-<h3 id="por-qué-ganan-los-métodos-implícitos">Por qué ganan los métodos
-implícitos</h3>
+<p><span class="math display">\[y_{1,n+1} = (1 - 100h)\,y_{1,n}, \qquad y_{2,n+1} = (1 - h)\,y_{2,n} + 100h\,y_{1,n}\]</span></p>
+<p>La primera recurrencia es la escalar ya estudiada y es estable solo si <span class="math inline">\(|1 - 100h| &lt; 1\)</span>, es decir <span class="math inline">\(h &lt; 0.02\)</span>. Y si ese factor supera 1 en módulo, la explosión no se queda en <span class="math inline">\(y_1\)</span>, el término <span class="math inline">\(100h\,y_{1,n}\)</span> de la segunda ecuación la inyecta en <span class="math inline">\(y_2\)</span>. La regla general es que en un sistema la condición de estabilidad debe cumplirla <strong>cada modo presente</strong>, así que la estabilidad la dicta el modo más rápido <span class="math inline">\(h &lt; 2\times 10^{-2}\)</span>, esto es, <span class="math inline">\(\sim 50\)</span> pasos para llegar a <span class="math inline">\(x = 1\)</span> y <span class="math inline">\(\sim 500\)</span> para <span class="math inline">\(x = 10\)</span>.</p>
+<p>La precisión en <span class="math inline">\(y_2\)</span> pediría <span class="math inline">\(h \approx 0.02\)</span> (error del <span class="math inline">\(\sim 1\%\)</span>), lo que es apenas el techo de estabilidad, y con un <span class="math inline">\(k_1\)</span> mayor el techo caería muy por debajo de lo útil. El tamaño de paso lo fija la <strong>estabilidad</strong>, no la <strong>precisión</strong>.</p>
+<h3 id="por-qué-ganan-los-métodos-implícitos">Por qué ganan los métodos implícitos</h3>
 <p>Euler hacia atrás da</p>
-<p><span class="math display">\[y_{1,n+1} = \frac{y_{1,n}}{1 + 100h},
-\qquad y_{2,n+1} = \frac{y_{2,n} + 100h\,y_{1,n+1}}{1 + h}\]</span></p>
-<p>con factores <span class="math inline">\(1/(1+100h)\)</span> y <span
-class="math inline">\(1/(1+h)\)</span>, ambos menores que <span
-class="math inline">\(1\)</span> para cualquier <span
-class="math inline">\(h &gt; 0\)</span>. No hay techo de estabilidad,
-así que el paso se elige solo por criterios de
-<strong>precisión</strong>. Con <span class="math inline">\(h =
-0.1\)</span> —cinco veces el límite de adelante— <span
-class="math inline">\(y_1\)</span> muere en un paso y <span
-class="math inline">\(y_2\)</span> sigue a la exacta con un error de
-unos pocos % en solo 10 pasos. El coste extra de despejar las ecuaciones
-implícitas (aquí trivial, primero <span
-class="math inline">\(y_{1,n+1}\)</span>, luego <span
-class="math inline">\(y_{2,n+1}\)</span> por sustitución) queda muy
-compensado por la reducción del número de pasos.</p>
+<p><span class="math display">\[y_{1,n+1} = \frac{y_{1,n}}{1 + 100h}, \qquad y_{2,n+1} = \frac{y_{2,n} + 100h\,y_{1,n+1}}{1 + h}\]</span></p>
+<p>con factores <span class="math inline">\(1/(1+100h)\)</span> y <span class="math inline">\(1/(1+h)\)</span>, ambos menores que <span class="math inline">\(1\)</span> para cualquier <span class="math inline">\(h &gt; 0\)</span>. No hay techo de estabilidad, así que el paso se elige solo por criterios de <strong>precisión</strong>. Con <span class="math inline">\(h = 0.1\)</span> —cinco veces el límite de adelante— <span class="math inline">\(y_1\)</span> muere en un paso y <span class="math inline">\(y_2\)</span> sigue a la exacta con un error de unos pocos % en solo 10 pasos. El coste extra de despejar las ecuaciones implícitas (aquí trivial, primero <span class="math inline">\(y_{1,n+1}\)</span>, luego <span class="math inline">\(y_{2,n+1}\)</span> por sustitución) queda muy compensado por la reducción del número de pasos.</p>
 <figure>
-<img src="figs/euler_rigida.png"
-alt="Arriba — Euler adelante con h = 0.021, apenas un 5 % por encima del límite de estabilidad. El modo rápido, ya extinguido en la solución exacta, revive y arrastra a y_2 en una oscilación creciente. Abajo — Euler adelante a su máximo paso legal (h = 0.019, 52 pasos) todavía arrastra una oscilación moribunda durante medio recorrido; Euler atrás con h = 0.1 sigue la curva en solo 10 pasos" />
-<figcaption aria-hidden="true">Arriba — Euler adelante con <span
-class="math inline">\(h = 0.021\)</span>, apenas un 5 % por encima del
-límite de estabilidad. El modo rápido, ya extinguido en la solución
-exacta, revive y arrastra a <span class="math inline">\(y_2\)</span> en
-una oscilación creciente. Abajo — Euler adelante a su máximo paso legal
-(<span class="math inline">\(h = 0.019\)</span>, 52 pasos) todavía
-arrastra una oscilación moribunda durante medio recorrido; Euler atrás
-con <span class="math inline">\(h = 0.1\)</span> sigue la curva en solo
-10 pasos</figcaption>
+<img src="figs/euler_rigida.png" alt="" /><figcaption>Arriba — Euler adelante con <span class="math inline">\(h = 0.021\)</span>, apenas un 5 % por encima del límite de estabilidad. El modo rápido, ya extinguido en la solución exacta, revive y arrastra a <span class="math inline">\(y_2\)</span> en una oscilación creciente. Abajo — Euler adelante a su máximo paso legal (<span class="math inline">\(h = 0.019\)</span>, 52 pasos) todavía arrastra una oscilación moribunda durante medio recorrido; Euler atrás con <span class="math inline">\(h = 0.1\)</span> sigue la curva en solo 10 pasos</figcaption>
 </figure>
 <h3 id="conclusión-práctica">Conclusión práctica</h3>
 <table>
@@ -379,17 +215,9 @@ con <span class="math inline">\(h = 0.1\)</span> sigue la curva en solo
 </tr>
 </tbody>
 </table>
-<p>La pregunta diagnóstica es simple: <em>¿el tamaño de paso lo fija la
-precisión o la estabilidad?</em> Si se necesita un paso diminuto solo
-para evitar que un modo rápido ya extinguido diverja, el problema es
-rígido y un método implícito se amortiza con creces.</p>
+<p>La pregunta diagnóstica es simple: <em>¿el tamaño de paso lo fija la precisión o la estabilidad?</em> Si se necesita un paso diminuto solo para evitar que un modo rápido ya extinguido diverja, el problema es rígido y un método implícito se amortiza con creces.</p>
 <blockquote>
-<p><strong>Comprueba tu comprensión.</strong> Para <span
-class="math inline">\(y&#39; = -50y\)</span>, ¿a partir de qué valor de
-<span class="math inline">\(h\)</span> se vuelve inestable Euler
-adelante? ¿Qué le ocurre a la solución numérica con <span
-class="math inline">\(h = 0.05\)</span>: diverge, decae monótonamente o
-decae oscilando?</p>
+<p><strong>Comprueba tu comprensión.</strong> Para <span class="math inline">\(y&#39; = -50y\)</span>, ¿a partir de qué valor de <span class="math inline">\(h\)</span> se vuelve inestable Euler adelante? ¿Qué le ocurre a la solución numérica con <span class="math inline">\(h = 0.05\)</span>: diverge, decae monótonamente o decae oscilando?</p>
 </blockquote>
 <nav class="chapnav"><a class="prev" href="02-RungeKutta.html">&larr; Métodos de Runge–Kutta</a><a class="index" href="index.html">&Iacute;ndice</a><a class="next" href="04-CondicionesContorno.html">Condiciones de contorno &rarr;</a></nav>
 </body>

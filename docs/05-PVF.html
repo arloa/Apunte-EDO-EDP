@@ -8,408 +8,234 @@
   <style>
     code{white-space: pre-wrap;}
     span.smallcaps{font-variant: small-caps;}
-    div.columns{display: flex; gap: min(4vw, 1.5em);}
-    div.column{flex: auto; overflow-x: auto;}
+    span.underline{text-decoration: underline;}
+    div.column{display: inline-block; vertical-align: top; width: 50%;}
     div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
-    /* The extra [class] is a hack that increases specificity enough to
-       override a similar rule in reveal.js */
-    ul.task-list[class]{list-style: none;}
-    ul.task-list li input[type="checkbox"] {
-      font-size: inherit;
-      width: 0.8em;
-      margin: 0 0.8em 0.2em -1.6em;
-      vertical-align: middle;
-    }
+    ul.task-list{list-style: none;}
   </style>
   <link rel="stylesheet" href="style.css" />
-  <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
-  <script
-  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"
-  type="text/javascript"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" type="text/javascript"></script>
 </head>
 <body>
 <nav class="chapnav"><a class="prev" href="04-CondicionesContorno.html">&larr; Condiciones de contorno</a><a class="index" href="index.html">&Iacute;ndice</a><a class="next" href="06-Autovalores.html">El método del disparo para problemas de autovalores &rarr;</a></nav>
 <nav id="TOC" role="doc-toc">
 <ul>
-<li><a href="#problemas-de-valores-de-frontera"
-id="toc-problemas-de-valores-de-frontera">Problemas de Valores de
-Frontera</a>
+<li><a href="#problemas-de-valores-de-frontera">Problemas de Valores de Frontera</a>
 <ul>
-<li><a href="#por-qué-los-pvf-son-difíciles"
-id="toc-por-qué-los-pvf-son-difíciles">Por qué los PVF son
-difíciles</a></li>
-<li><a href="#ejemplo-guía" id="toc-ejemplo-guía">Ejemplo guía</a></li>
-<li><a href="#existencia-y-unicidad"
-id="toc-existencia-y-unicidad">Existencia y unicidad</a></li>
-<li><a href="#el-método-del-disparo" id="toc-el-método-del-disparo">El
-método del disparo</a></li>
-<li><a
-href="#método-de-diferencias-finitas-mdf-para-problemas-de-valores-de-frontera"
-id="toc-método-de-diferencias-finitas-mdf-para-problemas-de-valores-de-frontera">Método
-de Diferencias Finitas (MDF) para problemas de valores de
-frontera</a></li>
-<li><a href="#comparación-disparo-vs.-mdf"
-id="toc-comparación-disparo-vs.-mdf">Comparación: disparo
-vs. MDF</a></li>
+<li><a href="#por-qué-los-pvf-son-difíciles">Por qué los PVF son difíciles</a></li>
+<li><a href="#ejemplo-guía">Ejemplo guía</a></li>
+<li><a href="#existencia-y-unicidad">Existencia y unicidad</a></li>
+<li><a href="#el-método-del-disparo">El método del disparo</a></li>
+<li><a href="#método-de-diferencias-finitas-mdf-para-problemas-de-valores-de-frontera">Método de Diferencias Finitas (MDF) para problemas de valores de frontera</a></li>
+<li><a href="#comparación-disparo-vs.-mdf">Comparación: disparo vs. MDF</a></li>
 </ul></li>
 </ul>
 </nav>
-<h1 id="problemas-de-valores-de-frontera">Problemas de Valores de
-Frontera</h1>
-<p>Un <strong>Problema de Valores de Frontera (PVF)</strong> proporciona
-condiciones en <strong>dos o más puntos distintos</strong> (típicamente
-los extremos del dominio, <span class="math inline">\(x = a\)</span> y
-<span class="math inline">\(x = b\)</span>). La comparación general PVI
-vs. PVF está en <a href="04-CondicionesContorno.md">Condiciones de
-contorno</a>.</p>
+<h1 id="problemas-de-valores-de-frontera">Problemas de Valores de Frontera</h1>
+<p>Un <strong>Problema de Valores de Frontera (PVF)</strong> proporciona condiciones en <strong>dos o más puntos distintos</strong> (típicamente los extremos del dominio, <span class="math inline">\(x = a\)</span> y <span class="math inline">\(x = b\)</span>). La comparación general PVI vs. PVF está en <a href="04-CondicionesContorno.md">Condiciones de contorno</a>.</p>
 <ul>
-<li><p><strong>Intuición:</strong> piensa en la distribución de
-temperatura a lo largo de una barra metálica. Conoces la temperatura en
-el extremo izquierdo <span class="math inline">\(y(a)\)</span> y en el
-derecho <span class="math inline">\(y(b)\)</span>, y debes encontrar una
-distribución que conecte ambos extremos fijados.</p></li>
+<li><p><strong>Intuición:</strong> piensa en la distribución de temperatura a lo largo de una barra metálica. Conoces la temperatura en el extremo izquierdo <span class="math inline">\(y(a)\)</span> y en el derecho <span class="math inline">\(y(b)\)</span>, y debes encontrar una distribución que conecte ambos extremos fijados.</p></li>
 <li><p><strong>Forma general (2º orden):</strong></p></li>
 </ul>
-<p><span class="math display">\[y&#39;&#39; = f(x, y, y&#39;), \quad
-\text{con } y(a) = \alpha \text{ e } y(b) = \beta\]</span></p>
+<p><span class="math display">\[y&#39;&#39; = f(x, y, y&#39;), \quad \text{con } y(a) = \alpha \text{ e } y(b) = \beta\]</span></p>
 <hr />
-<h2 id="por-qué-los-pvf-son-difíciles">Por qué los PVF son
-difíciles</h2>
-<p>En un PVI todas las condiciones se dan en el <em>mismo</em> punto
-inicial <span class="math inline">\(x = a\)</span> — conoces tanto <span
-class="math inline">\(y(a)\)</span> como <span
-class="math inline">\(y&#39;(a)\)</span>, así que puedes empezar a
-marchar de inmediato. Un PVF reparte esa información entre dos extremos,
-conoces <span class="math inline">\(y(a) = \alpha\)</span> a la
-izquierda, pero la pendiente <span
-class="math inline">\(y&#39;(a)\)</span> es
-<strong>desconocida</strong>. Sin la pendiente no se puede iniciar una
-integración hacia adelante — y aunque adivinaras una, no sabrías si la
-adivinanza era correcta hasta llegar al extremo lejano <span
-class="math inline">\(x = b\)</span> y comprobarla contra <span
-class="math inline">\(\beta\)</span>.</p>
-<p>Este es el obstáculo fundamental ya que <strong>la información
-necesaria para empezar a marchar está repartida por el dominio</strong>,
-de modo que ningún pase hacia adelante puede resolver el problema
-directamente. Las dos estrategias numéricas de este capítulo son sendas
-respuestas a ese obstáculo:</p>
+<h2 id="por-qué-los-pvf-son-difíciles">Por qué los PVF son difíciles</h2>
+<p>En un PVI todas las condiciones se dan en el <em>mismo</em> punto inicial <span class="math inline">\(x = a\)</span> — conoces tanto <span class="math inline">\(y(a)\)</span> como <span class="math inline">\(y&#39;(a)\)</span>, así que puedes empezar a marchar de inmediato. Un PVF reparte esa información entre dos extremos, conoces <span class="math inline">\(y(a) = \alpha\)</span> a la izquierda, pero la pendiente <span class="math inline">\(y&#39;(a)\)</span> es <strong>desconocida</strong>. Sin la pendiente no se puede iniciar una integración hacia adelante — y aunque adivinaras una, no sabrías si la adivinanza era correcta hasta llegar al extremo lejano <span class="math inline">\(x = b\)</span> y comprobarla contra <span class="math inline">\(\beta\)</span>.</p>
+<p>Este es el obstáculo fundamental ya que <strong>la información necesaria para empezar a marchar está repartida por el dominio</strong>, de modo que ningún pase hacia adelante puede resolver el problema directamente. Las dos estrategias numéricas de este capítulo son sendas respuestas a ese obstáculo:</p>
 <ul>
-<li><strong>Disparo</strong> — adivinar la pendiente desconocida,
-marchar, comprobar el borde lejano y refinar la adivinanza
-iterativamente.</li>
-<li><strong>Diferencias Finitas (MDF)</strong> — abandonar la marcha por
-completo; discretizar todo el dominio de una vez y resolver un sistema
-lineal acoplado para todos los puntos simultáneamente.</li>
+<li><strong>Disparo</strong> — adivinar la pendiente desconocida, marchar, comprobar el borde lejano y refinar la adivinanza iterativamente.</li>
+<li><strong>Diferencias Finitas (MDF)</strong> — abandonar la marcha por completo; discretizar todo el dominio de una vez y resolver un sistema lineal acoplado para todos los puntos simultáneamente.</li>
 </ul>
-<p>Llevaremos un único ejemplo guía a través de ambos métodos para poder
-compararlos directamente.</p>
+<p>Llevaremos un único ejemplo guía a través de ambos métodos para poder compararlos directamente.</p>
 <hr />
 <h2 id="ejemplo-guía">Ejemplo guía</h2>
 <p>A lo largo de este capítulo resolvemos el PVF lineal</p>
-<p><span class="math display">\[y&#39;&#39; = y, \quad y(0) = 0, \quad
-y(1) = 1\]</span></p>
-<p>La solución exacta es <span class="math inline">\(y(x) =
-\dfrac{\sinh(x)}{\sinh(1)}\)</span>, que usaremos para comprobar los
-resultados numéricos. (Para esta EDO, <span class="math inline">\(q(x) =
--1 &lt; 0\)</span>, así que por el principio del máximo la solución
-existe y es única — véase más abajo.)</p>
+<p><span class="math display">\[y&#39;&#39; = y, \quad y(0) = 0, \quad y(1) = 1\]</span></p>
+<p>La solución exacta es <span class="math inline">\(y(x) = \dfrac{\sinh(x)}{\sinh(1)}\)</span>, que usaremos para comprobar los resultados numéricos.</p>
+<figure>
+<img src="figs/pvf_ejemplo.png" alt="" /><figcaption>Solución exacta del ejemplo guía y su derivada. La curva azul <span class="math inline">\(y(x)\)</span> cumple las dos condiciones de frontera <span class="math inline">\(y(0)=0\)</span> e <span class="math inline">\(y(1)=1\)</span>. La curva roja <span class="math inline">\(y&#39;(x)\)</span> muestra la pendiente. Se ha resaltado el valor inicial <span class="math inline">\(y&#39;(0)=s^*\approx 0.851\)</span>, que será de relevancia en el método del disparo que se desarrolla más abajo.</figcaption>
+</figure>
 <hr />
 <h2 id="existencia-y-unicidad">Existencia y unicidad</h2>
-<p>Los PVF son mucho más delicados que los PVI, ya que un PVF puede
-tener solución única, infinitas soluciones o <strong>ninguna
-solución</strong>.</p>
+<p>Los PVF son mucho más delicados que los PVI, ya que un PVF puede tener solución única, infinitas soluciones o <strong>ninguna solución</strong>.</p>
 <ul>
-<li><em>Ejemplo con infinitas soluciones:</em> <span
-class="math inline">\(y&#39;&#39; + y = 0\)</span> con <span
-class="math inline">\(y(0) = 0, y(\pi) = 0 \implies y(x) = C
-\sin(x)\)</span> para cualquier constante <span
-class="math inline">\(C\)</span>.</li>
-<li><em>Ejemplo sin solución:</em> <span
-class="math inline">\(y&#39;&#39; + y = 0\)</span> con <span
-class="math inline">\(y(0) = 0, y(\pi) = 1\)</span> (imposible porque
-<span class="math inline">\(\sin(\pi) = 0 \neq 1\)</span>).</li>
+<li><em>Ejemplo con infinitas soluciones:</em> <span class="math inline">\(y&#39;&#39; + y = 0\)</span> con <span class="math inline">\(y(0) = 0, y(\pi) = 0 \implies y(x) = C \sin(x)\)</span> para cualquier constante <span class="math inline">\(C\)</span>.</li>
+<li><em>Ejemplo sin solución:</em> <span class="math inline">\(y&#39;&#39; + y = 0\)</span> con <span class="math inline">\(y(0) = 0, y(\pi) = 1\)</span> (imposible porque <span class="math inline">\(\sin(\pi) = 0 \neq 1\)</span>).</li>
 </ul>
-<p><strong>Teorema (PVF lineal).</strong> Para el PVF lineal <span
-class="math inline">\(y&#39;&#39; + p(x)y&#39; + q(x)y = r(x)\)</span>
-con condiciones de Dirichlet <span class="math inline">\(y(a) =
-\alpha\)</span>, <span class="math inline">\(y(b) = \beta\)</span>,
-existe solución única <strong>si y solo si</strong> el PVF homogéneo
-correspondiente (<span class="math inline">\(r = 0\)</span>, <span
-class="math inline">\(\alpha = \beta = 0\)</span>) tiene solo la
-solución trivial <span class="math inline">\(y \equiv 0\)</span>.</p>
-<p>Una <strong>condición suficiente</strong> sencilla es <span
-class="math inline">\(q(x) \leq 0\)</span> en <span
-class="math inline">\([a, b]\)</span> (por el principio del máximo una
-solución no trivial tendría un máximo o mínimo interior, lo cual es
-imposible). Nuestro ejemplo guía la cumple, ya que <span
-class="math inline">\(q(x) = -1 &lt; 0\)</span>.</p>
+<p><strong>Teorema (PVF lineal).</strong> Para el PVF lineal <span class="math inline">\(y&#39;&#39; + p(x)y&#39; + q(x)y = r(x)\)</span> con condiciones de Dirichlet <span class="math inline">\(y(a) = \alpha\)</span>, <span class="math inline">\(y(b) = \beta\)</span>, existe solución única <strong>si y solo si</strong> el PVF homogéneo correspondiente (<span class="math inline">\(r = 0\)</span>, <span class="math inline">\(\alpha = \beta = 0\)</span>) tiene solo la solución trivial <span class="math inline">\(y \equiv 0\)</span>.</p>
+<p>Una <strong>condición suficiente</strong> sencilla es <span class="math inline">\(q(x) \leq 0\)</span> en <span class="math inline">\([a, b]\)</span> (por el principio del máximo una solución no trivial tendría un máximo o mínimo interior, lo cual es imposible). Nuestro ejemplo guía la cumple, ya que <span class="math inline">\(q(x) = -1 &lt; 0\)</span>.</p>
 <hr />
 <h2 id="el-método-del-disparo">El método del disparo</h2>
-<p>El <strong>método del disparo</strong> convierte un PVF en una
-secuencia de PVI. Como conocemos <span
-class="math inline">\(y(a)=\alpha\)</span> pero no la pendiente <span
-class="math inline">\(y&#39;(a)\)</span>, <em>adivinamos</em> una
-pendiente, integramos el PVI resultante hasta <span
-class="math inline">\(x=b\)</span> y comparamos el valor calculado <span
-class="math inline">\(y(b)\)</span> con el requerido <span
-class="math inline">\(\beta\)</span>. La discrepancia alimenta un bucle
-de búsqueda de raíces que refina la adivinanza hasta satisfacer la
-condición en el borde lejano.</p>
-<p>El nombre viene de la artillería: se apunta el cañón, se dispara
-(integrar hacia adelante), se observa dónde cae el proyectil respecto al
-objetivo, se corrige el ángulo y se dispara de nuevo hasta dar en el
-blanco.</p>
+<p>El <strong>método del disparo</strong> convierte un PVF en una secuencia de PVI. Como conocemos <span class="math inline">\(y(a)=\alpha\)</span> pero no la pendiente <span class="math inline">\(y&#39;(a)\)</span>, <em>adivinamos</em> una pendiente, integramos el PVI resultante hasta <span class="math inline">\(x=b\)</span> y comparamos el valor calculado <span class="math inline">\(y(b)\)</span> con el requerido <span class="math inline">\(\beta\)</span>. La discrepancia alimenta un bucle de búsqueda de raíces que refina la adivinanza hasta satisfacer la condición en el borde lejano.</p>
+<p>El nombre viene de la artillería, en donde se apunta el cañón, se dispara (integrar hacia adelante), se observa dónde cae el proyectil respecto al objetivo, se corrige el ángulo y se dispara de nuevo hasta dar en el blanco.</p>
 <figure>
-<img src="figs/disparo.png"
-alt="Trayectorias del método del disparo sobre y’’ = y. Se observa que s₁ se queda corto, s₂ se pasa, y la pendiente corregida s* da exactamente en β" />
-<figcaption aria-hidden="true">Trayectorias del método del disparo sobre
-y’’ = y. Se observa que s₁ se queda corto, s₂ se pasa, y la pendiente
-corregida s* da exactamente en β</figcaption>
+<img src="figs/disparo.png" alt="" /><figcaption>Trayectorias del método del disparo sobre <span class="math inline">\(y&#39;&#39; = y\)</span>, integradas de forma exacta. Con <span class="math inline">\(s_1\)</span> se queda corto, <span class="math inline">\(s_2\)</span> se pasa, y la pendiente corregida <span class="math inline">\(s^*\)</span> da exactamente en <span class="math inline">\(\beta\)</span>.</figcaption>
 </figure>
 <hr />
 <h3 id="mecanismo-paso-a-paso">Mecanismo paso a paso</h3>
 <p>Consideremos un problema de valores de frontera de segundo orden:</p>
-<p><span class="math display">\[y&#39;&#39; = f(x, y, y&#39;), \quad
-y(a) = \alpha, \quad y(b) = \beta\]</span></p>
+<p><span class="math display">\[y&#39;&#39; = f(x, y, y&#39;), \quad y(a) = \alpha, \quad y(b) = \beta\]</span></p>
 <ol type="1">
-<li><strong>Convertir en un sistema de ecuaciones de primer
-orden:</strong> Introducimos <span class="math inline">\(u_1 =
-y\)</span> y <span class="math inline">\(u_2 = y&#39;\)</span>. La EDO
-de segundo orden se convierte en:</li>
+<li><strong>Convertir en un sistema de ecuaciones de primer orden:</strong> Introducimos <span class="math inline">\(u_1 = y\)</span> y <span class="math inline">\(u_2 = y&#39;\)</span>. La EDO de segundo orden se convierte en:</li>
 </ol>
-<p><span class="math display">\[\begin{cases} u_1&#39; = u_2 \\ u_2&#39;
-= f(x, u_1, u_2) \end{cases}\]</span></p>
+<p><span class="math display">\[\begin{cases} u_1&#39; = u_2 \\ u_2&#39; = f(x, u_1, u_2) \end{cases}\]</span></p>
 <ol start="2" type="1">
-<li><strong>Formular como Problema de Valor Inicial (PVI):</strong>
-Conocemos <span class="math inline">\(u_1(a) = \alpha\)</span>, pero la
-derivada <span class="math inline">\(u_2(a) = y&#39;(a)\)</span> es
-desconocida. Ponemos <span class="math inline">\(u_2(a) = s\)</span>,
-donde <span class="math inline">\(s\)</span> es un parámetro de
-pendiente desconocido (adivinanza).</li>
-<li><strong>Resolver el PVI numéricamente:</strong> Con un integrador
-estándar (como Runge–Kutta de 4º orden), integramos desde <span
-class="math inline">\(x = a\)</span> hasta <span class="math inline">\(x
-= b\)</span> con condiciones iniciales <span
-class="math inline">\((u_1(a), u_2(a)) = (\alpha, s)\)</span>. Esto da
-un valor de la solución en el borde lejano, denotado <span
-class="math inline">\(u_1(b; s)\)</span>.</li>
-<li><strong>Definir la función residual:</strong> Definimos una función
-de error en el borde <span class="math inline">\(F(s)\)</span>:</li>
+<li><p><strong>Formular como Problema de Valor Inicial (PVI):</strong> Conocemos <span class="math inline">\(u_1(a) = \alpha\)</span>, pero la derivada <span class="math inline">\(u_2(a) = y&#39;(a)\)</span> es desconocida. Ponemos <span class="math inline">\(u_2(a) = s\)</span>, donde <span class="math inline">\(s\)</span> es un parámetro de pendiente desconocido (adivinanza).</p></li>
+<li><p><strong>Resolver el PVI numéricamente:</strong> Con un integrador estándar (como Runge–Kutta de 4º orden), integramos desde <span class="math inline">\(x = a\)</span> hasta <span class="math inline">\(x = b\)</span> con condiciones iniciales <span class="math inline">\((u_1(a), u_2(a)) = (\alpha, s)\)</span>. Esto da un valor de la solución en el borde lejano, denotado <span class="math inline">\(u_1(b; s)\)</span>.</p></li>
+<li><p><strong>Definir la función residual:</strong> Definimos una función de error en el borde <span class="math inline">\(F(s)\)</span>: <span class="math display">\[F(s) = u_1(b; s) - \beta\]</span> El objetivo es encontrar un parámetro <span class="math inline">\(s^*\)</span> tal que <span class="math inline">\(F(s^*) = 0\)</span>.</p></li>
+<li><p><strong>Actualizar la adivinanza <span class="math inline">\(s\)</span>:</strong> El paso clave del método es encontrar la raíz <span class="math inline">\(s^*\)</span> de la ecuación <span class="math display">\[F(s^*) = 0, \qquad F(s) := y(b; s) - \beta,\]</span> es decir, el valor de la pendiente inicial que hace que la solución del PVI llegue justo a la condición de frontera en <span class="math inline">\(x = b\)</span>. Como cada evaluación de <span class="math inline">\(F\)</span> cuesta un disparo (integrar el PVI completo de <span class="math inline">\(a\)</span> a <span class="math inline">\(b\)</span>), conviene elegir un método de búsqueda de raíces que no desperdicie evaluaciones. Aquí se puede usar el método de la bisección, de la secante o de Newton–Raphson. Si la EDO es lineal, <span class="math inline">\(F(s)\)</span> es una recta y la <strong>secante</strong> converge en un solo paso (es interpolación lineal entre dos puntos); Newton–Raphson también, pero a mayor costo por iteración porque requiere <span class="math inline">\(\partial F/\partial s\)</span>. La bisección, en cambio, sigue necesitando varias iteraciones.</p></li>
 </ol>
-<p><span class="math display">\[F(s) = u_1(b; s) - \beta\]</span></p>
-<p>El objetivo es encontrar un parámetro <span
-class="math inline">\(s^*\)</span> tal que <span
-class="math inline">\(F(s^*) = 0\)</span>. 5. <strong>Actualizar la
-adivinanza <span class="math inline">\(s\)</span>:</strong></p>
-<p>En una EDO lineal, la solución depende de la pendiente <span
-class="math inline">\(y(x;s)=y_p(x)+s\,y_h(x)\)</span>, donde <span
-class="math inline">\(y_p\)</span> usa <span
-class="math inline">\(s=0\)</span> e <span
-class="math inline">\(y_h\)</span> resuelve el problema homogéneo con
-<span class="math inline">\(y_h(a)=0\)</span>, <span
-class="math inline">\(y_h&#39;(a)=1\)</span>. Por tanto <span
-class="math inline">\(F(s)=y_p(b)+s\,y_h(b)-\beta\)</span> es una recta
-y dos disparos determinan su raíz (salvo el error del integrador).</p>
-<ul>
-<li><strong>Ecuaciones lineales:</strong> dos disparos distintos <span
-class="math inline">\(s_1\)</span> y <span
-class="math inline">\(s_2\)</span> determinan la recta; la interpolación
-lineal da el <span class="math inline">\(s^*\)</span> exacto, que se usa
-luego en un tercer pase de integración (de confirmación).</li>
-<li><strong>Ecuaciones no lineales:</strong> <span
-class="math inline">\(F(s)\)</span> deja de ser lineal, así que se usa
-búsqueda iterativa de raíces — el <strong>método de la secante</strong>
-(sin derivadas, reutiliza los dos últimos disparos) o
-<strong>Newton–Raphson</strong> (necesita <span
-class="math inline">\(\partial F/\partial s\)</span>, obtenible mediante
-ecuaciones de sensibilidad) — actualizando <span
-class="math inline">\(s_k \to s_{k+1}\)</span> hasta que <span
-class="math inline">\(|F(s)| &lt; \text{tolerancia}\)</span>.</li>
-</ul>
 <hr />
-<h3 id="ejemplo-resuelto-disparo-sobre-y-y">Ejemplo resuelto: disparo
-sobre <span class="math inline">\(y&#39;&#39; = y\)</span></h3>
-<p>Aplicamos el método del disparo a nuestro ejemplo guía <span
-class="math inline">\(y&#39;&#39; = y\)</span>, <span
-class="math inline">\(y(0) = 0\)</span>, <span
-class="math inline">\(y(1) = 1\)</span>.</p>
-<p><strong>Pasos 1–2.</strong> Conversión a sistema de primer orden con
-<span class="math inline">\(u_1 = y\)</span>, <span
-class="math inline">\(u_2 = y&#39;\)</span>:</p>
-<p><span class="math display">\[u_1&#39; = u_2, \quad u_2&#39; = u_1,
-\quad u_1(0) = 0, \quad u_2(0) = s\]</span></p>
-<p>La solución del PVI con pendiente inicial <span
-class="math inline">\(s\)</span> es <span class="math inline">\(y(x; s)
-= s \sinh(x)\)</span> (el término en <span
-class="math inline">\(\cosh\)</span> desaparece porque <span
-class="math inline">\(y(0) = 0\)</span>).</p>
-<p><strong>Pasos 3–4.</strong> El residuo es <span
-class="math inline">\(F(s) = y(1; s) - 1 = s \sinh(1) - 1\)</span>.</p>
-<p><strong>Paso 5.</strong> Dos disparos e interpolación lineal:</p>
+<h3 id="ejemplo-resuelto-disparo-sobre-y-y">Ejemplo resuelto: disparo sobre <span class="math inline">\(y&#39;&#39; = y\)</span></h3>
+<p>Aplicamos el método del disparo a nuestro ejemplo guía <span class="math inline">\(y&#39;&#39; = y\)</span>, <span class="math inline">\(y(0) = 0\)</span>, <span class="math inline">\(y(1) = 1\)</span>. Cada disparo será una integración con Euler adelante de paso <span class="math inline">\(h = 0.5\)</span> (dos pasos), grosero a propósito para poder hacer toda la cuenta a mano.</p>
+<p><strong>Pasos 1–2: el PVI parametrizado.</strong> Con <span class="math inline">\(u_1 = y\)</span>, <span class="math inline">\(u_2 = y&#39;\)</span>:</p>
+<p><span class="math display">\[u_1&#39; = u_2, \quad u_2&#39; = u_1, \quad u_1(0) = 0, \quad u_2(0) = s\]</span></p>
+<p><strong>Pasos 3–4: un disparo = dos pasos de Euler.</strong> Cada paso actualiza cada componente como <span class="math inline">\(u_{n+1} = u_n + h\,u&#39;_n\)</span>; para este sistema <span class="math inline">\(u_1&#39; = u_2\)</span> y <span class="math inline">\(u_2&#39; = u_1\)</span>. Aplicado a dos adivinanzas de ejemplo:</p>
+<div class="columns">
+<div class="column">
+<p>Disparo 1, <span class="math inline">\(s_1 = 0.5\)</span>:</p>
+<table>
+<thead>
+<tr class="header">
+<th><span class="math inline">\(x\)</span></th>
+<th><span class="math inline">\(u_1\)</span></th>
+<th><span class="math inline">\(u_2\)</span></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><span class="math inline">\(0\)</span></td>
+<td><span class="math inline">\(0\)</span></td>
+<td><span class="math inline">\(0.5\)</span></td>
+</tr>
+<tr class="even">
+<td><span class="math inline">\(0.5\)</span></td>
+<td><span class="math inline">\(0.25\)</span></td>
+<td><span class="math inline">\(0.5\)</span></td>
+</tr>
+<tr class="odd">
+<td><span class="math inline">\(1\)</span></td>
+<td><span class="math inline">\(0.5\)</span></td>
+<td><span class="math inline">\(0.625\)</span></td>
+</tr>
+</tbody>
+</table>
+</div><div class="column">
+<p>Disparo 2, <span class="math inline">\(s_2 = 1.3\)</span>:</p>
+<table>
+<thead>
+<tr class="header">
+<th><span class="math inline">\(x\)</span></th>
+<th><span class="math inline">\(u_1\)</span></th>
+<th><span class="math inline">\(u_2\)</span></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><span class="math inline">\(0\)</span></td>
+<td><span class="math inline">\(0\)</span></td>
+<td><span class="math inline">\(1.3\)</span></td>
+</tr>
+<tr class="even">
+<td><span class="math inline">\(0.5\)</span></td>
+<td><span class="math inline">\(0.65\)</span></td>
+<td><span class="math inline">\(1.3\)</span></td>
+</tr>
+<tr class="odd">
+<td><span class="math inline">\(1\)</span></td>
+<td><span class="math inline">\(1.3\)</span></td>
+<td><span class="math inline">\(1.625\)</span></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<p>En ambos casos el valor final de <span class="math inline">\(u_1\)</span> coincide con la pendiente elegida, es decir, <span class="math inline">\(y(1; s) \approx s\)</span> para cualquier <span class="math inline">\(s\)</span>. El residuo discretizado es entonces <span class="math inline">\(F(s) = s - 1\)</span>, una recta, como corresponde a una EDO lineal.</p>
+<p><strong>Paso 5: dos disparos y un paso de secante.</strong> Las dos tablas de arriba son los disparos con adivinanzas <span class="math inline">\(s_1 = 0.5\)</span> y <span class="math inline">\(s_2 = 1.3\)</span>. Podemos resumirlas en:</p>
 <table>
 <thead>
 <tr class="header">
 <th>Disparo</th>
 <th><span class="math inline">\(s\)</span></th>
-<th><span class="math inline">\(y(1; s) = s \sinh(1)\)</span></th>
-<th><span class="math inline">\(F(s) = y(1;s) - 1\)</span></th>
+<th><span class="math inline">\(y(1; s)\)</span> (Euler)</th>
+<th><span class="math inline">\(F(s)\)</span></th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
 <td>1</td>
-<td><span class="math inline">\(s_1 = 0\)</span></td>
-<td><span class="math inline">\(0\)</span></td>
-<td><span class="math inline">\(-1\)</span></td>
+<td><span class="math inline">\(s_1 = 0.5\)</span></td>
+<td><span class="math inline">\(0.5\)</span> (se queda corto)</td>
+<td><span class="math inline">\(-0.5\)</span></td>
 </tr>
 <tr class="even">
 <td>2</td>
-<td><span class="math inline">\(s_2 = 1\)</span></td>
-<td><span class="math inline">\(\sinh(1) \approx 1.1752\)</span></td>
-<td><span class="math inline">\(+0.1752\)</span></td>
+<td><span class="math inline">\(s_2 = 1.3\)</span></td>
+<td><span class="math inline">\(1.3\)</span> (se pasa)</td>
+<td><span class="math inline">\(+0.3\)</span></td>
 </tr>
 </tbody>
 </table>
-<p>Interpolación lineal entre <span class="math inline">\((s_1, F_1) =
-(0, -1)\)</span> y <span class="math inline">\((s_2, F_2) = (1,
-0.1752)\)</span>:</p>
-<p><span class="math display">\[s^* = s_1 - F(s_1) \frac{s_2 -
-s_1}{F(s_2) - F(s_1)} = 0 - (-1) \cdot \frac{1}{0.1752 - (-1)} =
-\frac{1}{1.1752} \approx \mathbf{0.8509}\]</span></p>
-<p><strong>Disparo 3 de confirmación.</strong> Integrando con <span
-class="math inline">\(s^* = 0.8509\)</span>:</p>
-<p><span class="math display">\[y(1;\, 0.8509) = 0.8509 \times \sinh(1)
-\approx 0.8509 \times 1.1752 \approx \mathbf{1.0000}
-\checkmark\]</span></p>
-<p>La pendiente exacta es <span
-class="math inline">\(s^*=1/\sinh(1)\approx0.8509\)</span>. La
-interpolación recupera la raíz, salvo el redondeo y el error del
-integrador usado en cada disparo.</p>
+<p>Un paso de secante entre <span class="math inline">\((s_1, F_1) = (0.5, -0.5)\)</span> y <span class="math inline">\((s_2, F_2) = (1.3, 0.3)\)</span>:</p>
+<p><span class="math display">\[s_3 = s_1 - F(s_1)\,\frac{s_2 - s_1}{F(s_2) - F(s_1)} = 0.5 - (-0.5)\,\frac{1.3 - 0.5}{0.3 - (-0.5)} = 0.5 + 0.5\,\frac{0.8}{0.8} = \mathbf{1.0}\]</span></p>
+<p>Como <span class="math inline">\(F\)</span> es una recta, ese único paso da la raíz exacta del residuo discretizado.</p>
+<p><strong>Disparo de confirmación.</strong> Integrando con <span class="math inline">\(s = 1\)</span> da <span class="math inline">\((0, 1) \to (0.5,\ 0.5) \to (1,\ 1)\)</span> — llega exactamente a <span class="math inline">\(\beta\)</span>. <span class="math inline">\(\checkmark\)</span></p>
+<figure>
+<img src="figs/disparo_euler.png" alt="" /><figcaption>Las tres trayectorias de la cuenta a mano. Disparos integrados con Euler de paso <span class="math inline">\(h = 0.5\)</span> (poligonales de dos tramos). <span class="math inline">\(s_1 = 0.5\)</span> se queda corto, <span class="math inline">\(s_2 = 1.3\)</span> se pasa, y la corrección de la secante <span class="math inline">\(s_3 = 1\)</span> da en <span class="math inline">\(\beta\)</span> en el problema discretizado. La curva negra es la solución exacta, incluida como referencia del error del integrador.</figcaption>
+</figure>
+<p><strong>El precio del paso <span class="math inline">\(h\)</span> grande.</strong> La secante encontró <span class="math inline">\(s = 1\)</span>, la raíz exacta del residuo <em>discretizado</em> — es decir, del residuo tal como lo calcula Euler con <span class="math inline">\(h = 0.5\)</span>. La pendiente verdadera, sin embargo, es <span class="math inline">\(s^* = 1/\sinh(1) \approx 0.851\)</span> — la que aparecía en la figura conceptual del método, donde los disparos se integran de forma exacta. La diferencia de <span class="math inline">\(\approx 0.15\)</span> es enteramente error del integrador. El método del disparo halla la raíz del residuo <em>que el integrador calcula</em>, no del residuo exacto, y al refinar <span class="math inline">\(h\)</span> (o usar un integrador más preciso como RK4) la raíz numérica converge al valor real.</p>
+<figure>
+<img src="figs/disparo_F.png" alt="" /><figcaption>El residuo <span class="math inline">\(F(s)\)</span> del método del disparo visto como función de la pendiente inicial. Los dos disparos marcados en azul y naranja permiten determinar la raíz por el método de la secante. El punto negro marca la raíz exacta <span class="math inline">\(s^* \approx 0.851\)</span>; la distancia entre ambas es el error del integrador.</figcaption>
+</figure>
 <blockquote>
-<p><strong>Comprueba tu comprensión.</strong> Si dos disparos dan <span
-class="math inline">\(F(s_1) = 0.3\)</span> en <span
-class="math inline">\(s_1 = 1\)</span> y <span
-class="math inline">\(F(s_2) = -0.1\)</span> en <span
-class="math inline">\(s_2 = 2\)</span>, ¿cuál es el <span
-class="math inline">\(s^*\)</span> interpolado?</p>
+<p><strong>Comprueba tu comprensión.</strong> Si dos disparos dan <span class="math inline">\(F(s_1) = 0.3\)</span> en <span class="math inline">\(s_1 = 1\)</span> y <span class="math inline">\(F(s_2) = -0.1\)</span> en <span class="math inline">\(s_2 = 2\)</span>, ¿cuál es el <span class="math inline">\(s^*\)</span> interpolado?</p>
 </blockquote>
 <hr />
-<h2
-id="método-de-diferencias-finitas-mdf-para-problemas-de-valores-de-frontera">Método
-de Diferencias Finitas (MDF) para problemas de valores de frontera</h2>
-<p>Igual que en los problemas de valor inicial, podemos usar el método
-de diferencias finitas (MDF) en los problemas de valores de frontera. El
-<strong>MDF</strong> resuelve EDO reemplazando las derivadas continuas
-por aproximaciones algebraicas en los puntos de una malla. En lugar de
-integrar una función hacia adelante como el método del disparo, el MDF
-plantea un sistema de ecuaciones lineales en todo el dominio y resuelve
-simultáneamente todos los valores desconocidos.</p>
+<h2 id="método-de-diferencias-finitas-mdf-para-problemas-de-valores-de-frontera">Método de Diferencias Finitas (MDF) para problemas de valores de frontera</h2>
+<p>Igual que en los problemas de valor inicial, podemos usar el método de diferencias finitas (MDF) en los problemas de valores de frontera. El <strong>MDF</strong> resuelve EDO reemplazando las derivadas continuas por aproximaciones algebraicas en los puntos de una malla. En lugar de integrar una función hacia adelante como el método del disparo, el MDF plantea un sistema de ecuaciones lineales en todo el dominio y resuelve simultáneamente todos los valores desconocidos.</p>
 <hr />
-<h3 id="paso-1-discretizar-el-dominio">Paso 1: Discretizar el
-dominio</h3>
-<p>Dividimos el intervalo <span class="math inline">\([a, b]\)</span> en
-<span class="math inline">\(N\)</span> subintervalos iguales de tamaño
-<span class="math inline">\(h = \frac{b - a}{N}\)</span>.</p>
-<p>Esto crea <span class="math inline">\(N + 1\)</span> puntos de
-malla:</p>
-<p><span class="math display">\[x_i = a + i \cdot h \quad \text{para } i
-= 0, 1, 2, \dots, N\]</span></p>
-<p>La solución exacta <span class="math inline">\(y(x_i)\)</span> en el
-punto <span class="math inline">\(x_i\)</span> se aproxima por un valor
-discreto <span class="math inline">\(y_i\)</span>.</p>
+<h3 id="paso-1-discretizar-el-dominio">Paso 1: Discretizar el dominio</h3>
+<p>Dividimos el intervalo <span class="math inline">\([a, b]\)</span> en <span class="math inline">\(N\)</span> subintervalos iguales de tamaño <span class="math inline">\(h = \frac{b - a}{N}\)</span>.</p>
+<p>Esto crea <span class="math inline">\(N + 1\)</span> puntos de malla:</p>
+<p><span class="math display">\[x_i = a + i \cdot h \quad \text{para } i = 0, 1, 2, \dots, N\]</span></p>
+<p>La solución exacta <span class="math inline">\(y(x_i)\)</span> en el punto <span class="math inline">\(x_i\)</span> se aproxima por un valor discreto <span class="math inline">\(y_i\)</span>.</p>
 <hr />
-<h3
-id="paso-2-reemplazar-las-derivadas-por-fórmulas-en-diferencias">Paso 2:
-Reemplazar las derivadas por fórmulas en diferencias</h3>
-<p>Usando desarrollos de Taylor alrededor de <span
-class="math inline">\(x_i\)</span>, las derivadas se reemplazan por
-diferencias finitas:</p>
+<h3 id="paso-2-reemplazar-las-derivadas-por-fórmulas-en-diferencias">Paso 2: Reemplazar las derivadas por fórmulas en diferencias</h3>
+<p>Usando desarrollos de Taylor alrededor de <span class="math inline">\(x_i\)</span>, las derivadas se reemplazan por diferencias finitas:</p>
 <ul>
-<li><strong>Primera derivada (diferencia centrada, precisión <span
-class="math inline">\(\mathcal{O}(h^2)\)</span>):</strong></li>
+<li><strong>Primera derivada (diferencia centrada, precisión <span class="math inline">\(\mathcal{O}(h^2)\)</span>):</strong></li>
 </ul>
-<p><span class="math display">\[y&#39;(x_i) \approx \frac{y_{i+1} -
-y_{i-1}}{2h}\]</span></p>
+<p><span class="math display">\[y&#39;(x_i) \approx \frac{y_{i+1} - y_{i-1}}{2h}\]</span></p>
 <ul>
-<li><strong>Segunda derivada (diferencia centrada, precisión <span
-class="math inline">\(\mathcal{O}(h^2)\)</span>):</strong></li>
+<li><strong>Segunda derivada (diferencia centrada, precisión <span class="math inline">\(\mathcal{O}(h^2)\)</span>):</strong></li>
 </ul>
-<p><span class="math display">\[y&#39;&#39;(x_i) \approx \frac{y_{i+1} -
-2y_i + y_{i-1}}{h^2}\]</span></p>
+<p><span class="math display">\[y&#39;&#39;(x_i) \approx \frac{y_{i+1} - 2y_i + y_{i-1}}{h^2}\]</span></p>
 <hr />
-<h3 id="paso-3-plantear-y-resolver-el-sistema-lineal">Paso 3: Plantear y
-resolver el sistema lineal</h3>
-<p>Aplicamos el esquema discretizado en cada punto interior de la malla
-<span class="math inline">\(i = 1, 2, \dots, N-1\)</span>. Cada punto
-aporta una ecuación lineal que vincula <span
-class="math inline">\(y_{i-1}\)</span>, <span
-class="math inline">\(y_i\)</span> e <span
-class="math inline">\(y_{i+1}\)</span>, produciendo un sistema lineal
-<span class="math inline">\((N-1) \times (N-1)\)</span>, <span
-class="math inline">\(A\mathbf{y} = \mathbf{b}\)</span>. Como el stencil
-centrado acopla cada incógnita solo con sus dos vecinas más próximas,
-<span class="math inline">\(A\)</span> es <strong>tridiagonal</strong> y
-el sistema se resuelve eficientemente con el algoritmo de Thomas, de
-coste <span class="math inline">\(\mathcal{O}(N)\)</span>.</p>
+<h3 id="paso-3-plantear-y-resolver-el-sistema-lineal">Paso 3: Plantear y resolver el sistema lineal</h3>
+<p>Aplicamos el esquema discretizado en cada punto interior de la malla <span class="math inline">\(i = 1, 2, \dots, N-1\)</span>. Cada punto aporta una ecuación lineal que vincula <span class="math inline">\(y_{i-1}\)</span>, <span class="math inline">\(y_i\)</span> e <span class="math inline">\(y_{i+1}\)</span>, produciendo un sistema lineal <span class="math inline">\((N-1) \times (N-1)\)</span>, <span class="math inline">\(A\mathbf{y} = \mathbf{b}\)</span>. Como el stencil centrado acopla cada incógnita solo con sus dos vecinas más próximas, <span class="math inline">\(A\)</span> es <strong>tridiagonal</strong> y el sistema se resuelve eficientemente con el algoritmo de Thomas, de coste <span class="math inline">\(\mathcal{O}(N)\)</span>.</p>
 <hr />
-<h4 id="ejemplo-resuelto-mdf-sobre-y-y">Ejemplo resuelto: MDF sobre
-<span class="math inline">\(y&#39;&#39; = y\)</span></h4>
-<p>Aplicamos el MDF a nuestro ejemplo guía <span
-class="math inline">\(y&#39;&#39; = y\)</span>, <span
-class="math inline">\(y(0) = 0\)</span>, <span
-class="math inline">\(y(1) = 1\)</span> con <span
-class="math inline">\(N = 4\)</span>, <span class="math inline">\(h =
-0.25\)</span>.</p>
-<p><strong>Sustituir las diferencias finitas.</strong> Reemplazando
-<span class="math inline">\(y&#39;&#39;\)</span> por la diferencia
-centrada e <span class="math inline">\(y\)</span> por <span
-class="math inline">\(y_i\)</span>:</p>
-<p><span class="math display">\[\frac{y_{i+1} - 2y_i + y_{i-1}}{h^2} =
-y_i \implies y_{i-1} - (2 + h^2)\,y_i + y_{i+1} = 0\]</span></p>
-<p>Con <span class="math inline">\(h = 0.25\)</span>, <span
-class="math inline">\(h^2 = 0.0625\)</span>, así que <span
-class="math inline">\(2 + h^2 = 2.0625\)</span>:</p>
-<p><span class="math display">\[y_{i-1} - 2.0625\,y_i + y_{i+1} =
-0\]</span></p>
-<p><strong>Escribir las ecuaciones en cada nodo interior</strong> (<span
-class="math inline">\(i = 1, 2, 3\)</span>), sustituyendo los valores de
-contorno conocidos <span class="math inline">\(y_0 = 0\)</span> e <span
-class="math inline">\(y_4 = 1\)</span>:</p>
+<h4 id="ejemplo-resuelto-mdf-sobre-y-y">Ejemplo resuelto: MDF sobre <span class="math inline">\(y&#39;&#39; = y\)</span></h4>
+<p>Aplicamos el MDF a nuestro ejemplo guía <span class="math inline">\(y&#39;&#39; = y\)</span>, <span class="math inline">\(y(0) = 0\)</span>, <span class="math inline">\(y(1) = 1\)</span> con <span class="math inline">\(N = 4\)</span>, <span class="math inline">\(h = 0.25\)</span>.</p>
+<p><strong>Sustituir las diferencias finitas.</strong> Reemplazando <span class="math inline">\(y&#39;&#39;\)</span> por la diferencia centrada e <span class="math inline">\(y\)</span> por <span class="math inline">\(y_i\)</span>:</p>
+<p><span class="math display">\[\frac{y_{i+1} - 2y_i + y_{i-1}}{h^2} = y_i \implies y_{i-1} - (2 + h^2)\,y_i + y_{i+1} = 0\]</span></p>
+<p>Con <span class="math inline">\(h = 0.25\)</span>, <span class="math inline">\(h^2 = 0.0625\)</span>, así que <span class="math inline">\(2 + h^2 = 2.0625\)</span>:</p>
+<p><span class="math display">\[y_{i-1} - 2.0625\,y_i + y_{i+1} = 0\]</span></p>
+<p><strong>Escribir las ecuaciones en cada nodo interior</strong> (<span class="math inline">\(i = 1, 2, 3\)</span>), sustituyendo los valores de contorno conocidos <span class="math inline">\(y_0 = 0\)</span> e <span class="math inline">\(y_4 = 1\)</span>:</p>
 <ul>
-<li><span class="math inline">\(i = 1\)</span>: <span
-class="math inline">\(\quad y_0 - 2.0625\,y_1 + y_2 = 0 \implies
--2.0625\,y_1 + y_2 = 0\)</span></li>
-<li><span class="math inline">\(i = 2\)</span>: <span
-class="math inline">\(\quad y_1 - 2.0625\,y_2 + y_3 = 0\)</span></li>
-<li><span class="math inline">\(i = 3\)</span>: <span
-class="math inline">\(\quad y_2 - 2.0625\,y_3 + y_4 = 0 \implies y_2 -
-2.0625\,y_3 = -1\)</span></li>
+<li><span class="math inline">\(i = 1\)</span>: <span class="math inline">\(\quad y_0 - 2.0625\,y_1 + y_2 = 0 \implies -2.0625\,y_1 + y_2 = 0\)</span></li>
+<li><span class="math inline">\(i = 2\)</span>: <span class="math inline">\(\quad y_1 - 2.0625\,y_2 + y_3 = 0\)</span></li>
+<li><span class="math inline">\(i = 3\)</span>: <span class="math inline">\(\quad y_2 - 2.0625\,y_3 + y_4 = 0 \implies y_2 - 2.0625\,y_3 = -1\)</span></li>
 </ul>
-<p><strong>Ensamblar el sistema tridiagonal</strong> <span
-class="math inline">\(A\mathbf{y} = \mathbf{b}\)</span>. Los valores de
-contorno <span class="math inline">\(y_0 = 0\)</span> e <span
-class="math inline">\(y_4 = 1\)</span> son <em>conocidos</em>, así que
-no aparecen como incógnitas; en su lugar <span class="math inline">\(y_4
-= 1\)</span> pasa al lado derecho de la última ecuación:</p>
-<p><span class="math display">\[\begin{bmatrix} -2.0625 &amp; 1 &amp; 0
-\\ 1 &amp; -2.0625 &amp; 1 \\ 0 &amp; 1 &amp; -2.0625 \end{bmatrix}
-\begin{bmatrix} y_1 \\ y_2 \\ y_3 \end{bmatrix} = \begin{bmatrix} 0 \\ 0
-\\ -1 \end{bmatrix}\]</span></p>
-<p><strong>Resolver por sustitución progresiva</strong> (algoritmo de
-Thomas):</p>
+<p><strong>Ensamblar el sistema tridiagonal</strong> <span class="math inline">\(A\mathbf{y} = \mathbf{b}\)</span>. Los valores de contorno <span class="math inline">\(y_0 = 0\)</span> e <span class="math inline">\(y_4 = 1\)</span> son <em>conocidos</em>, así que no aparecen como incógnitas; en su lugar <span class="math inline">\(y_4 = 1\)</span> pasa al lado derecho de la última ecuación:</p>
+<p><span class="math display">\[\begin{bmatrix} -2.0625 &amp; 1 &amp; 0 \\ 1 &amp; -2.0625 &amp; 1 \\ 0 &amp; 1 &amp; -2.0625 \end{bmatrix} \begin{bmatrix} y_1 \\ y_2 \\ y_3 \end{bmatrix} = \begin{bmatrix} 0 \\ 0 \\ -1 \end{bmatrix}\]</span></p>
+<p><strong>Resolver por sustitución progresiva</strong> (algoritmo de Thomas):</p>
 <ul>
-<li>De la fila 1: <span class="math inline">\(y_2 =
-2.0625\,y_1\)</span></li>
-<li>De la fila 2: <span class="math inline">\(y_3 = 2.0625\,y_2 - y_1 =
-(2.0625^2 - 1)\,y_1 = 3.2539\,y_1\)</span></li>
-<li>De la fila 3: <span class="math inline">\(y_2 - 2.0625\,y_3 = -1
-\implies 2.0625\,y_1 - 2.0625 \times 3.2539\,y_1 = -1 \implies y_1
-\approx 0.2151\)</span></li>
+<li>De la fila 1: <span class="math inline">\(y_2 = 2.0625\,y_1\)</span></li>
+<li>De la fila 2: <span class="math inline">\(y_3 = 2.0625\,y_2 - y_1 = (2.0625^2 - 1)\,y_1 = 3.2539\,y_1\)</span></li>
+<li>De la fila 3: <span class="math inline">\(y_2 - 2.0625\,y_3 = -1 \implies 2.0625\,y_1 - 2.0625 \times 3.2539\,y_1 = -1 \implies y_1 \approx 0.2151\)</span></li>
 </ul>
-<p>Luego <span class="math inline">\(y_2 \approx 0.4437\)</span> e <span
-class="math inline">\(y_3 \approx 0.7000\)</span>.</p>
-<p><strong>Comparar con la solución exacta</strong> <span
-class="math inline">\(y(x) = \sinh(x)/\sinh(1)\)</span>:</p>
+<p>Luego <span class="math inline">\(y_2 \approx 0.4437\)</span> e <span class="math inline">\(y_3 \approx 0.7000\)</span>.</p>
+<p><strong>Comparar con la solución exacta</strong> <span class="math inline">\(y(x) = \sinh(x)/\sinh(1)\)</span>:</p>
 <table>
 <thead>
 <tr class="header">
@@ -440,90 +266,24 @@ class="math inline">\(y(x) = \sinh(x)/\sinh(1)\)</span>:</p>
 </tr>
 </tbody>
 </table>
-<p>Los errores son del orden de <span
-class="math inline">\(10^{-4}\)</span>, coherentes con la precisión
-<span class="math inline">\(\mathcal{O}(h^2)\)</span> del esquema
-centrado.</p>
+<p>Los errores son del orden de <span class="math inline">\(10^{-4}\)</span>, coherentes con la precisión <span class="math inline">\(\mathcal{O}(h^2)\)</span> del esquema centrado.</p>
 <hr />
-<h3
-id="tratamiento-de-distintas-condiciones-de-contorno-en-la-matriz">Tratamiento
-de distintas condiciones de contorno en la matriz</h3>
-<p>El ejemplo resuelto anterior usa condiciones de
-<strong>Dirichlet</strong> (<span class="math inline">\(y_0 =
-\alpha\)</span>, <span class="math inline">\(y_N = \beta\)</span>). Los
-valores de contorno son conocidos, así que pasan al vector del lado
-derecho <span class="math inline">\(\mathbf{b}\)</span> y no aparecen
-como incógnitas. La primera y la última fila de <span
-class="math inline">\(A\)</span> contienen entonces solo los
-acoplamientos interiores.</p>
-<p>Las condiciones de <strong>Neumann</strong> (<span
-class="math inline">\(y&#39;(a) = \alpha&#39;\)</span> o <span
-class="math inline">\(y&#39;(b) = \beta&#39;\)</span>) requieren un
-tratamiento distinto porque el <em>valor</em> en el borde pasa a ser
-desconocido. El enfoque estándar usa un <strong>punto fantasma</strong>
-— un punto de malla ficticio <span class="math inline">\(y_{-1}\)</span>
-justo fuera del dominio — para mantener la precisión <span
-class="math inline">\(\mathcal{O}(h^2)\)</span>:</p>
+<h3 id="tratamiento-de-distintas-condiciones-de-contorno-en-la-matriz">Tratamiento de distintas condiciones de contorno en la matriz</h3>
+<p>El ejemplo resuelto anterior usa condiciones de <strong>Dirichlet</strong> (<span class="math inline">\(y_0 = \alpha\)</span>, <span class="math inline">\(y_N = \beta\)</span>). Los valores de contorno son conocidos, así que pasan al vector del lado derecho <span class="math inline">\(\mathbf{b}\)</span> y no aparecen como incógnitas. La primera y la última fila de <span class="math inline">\(A\)</span> contienen entonces solo los acoplamientos interiores.</p>
+<p>Las condiciones de <strong>Neumann</strong> (<span class="math inline">\(y&#39;(a) = \alpha&#39;\)</span> o <span class="math inline">\(y&#39;(b) = \beta&#39;\)</span>) requieren un tratamiento distinto porque el <em>valor</em> en el borde pasa a ser desconocido. El enfoque estándar usa un <strong>punto fantasma</strong> — un punto de malla ficticio <span class="math inline">\(y_{-1}\)</span> justo fuera del dominio — para mantener la precisión <span class="math inline">\(\mathcal{O}(h^2)\)</span>:</p>
 <ol type="1">
-<li>Aproximar la derivada en <span class="math inline">\(x_0\)</span>
-con una diferencia centrada, <span class="math inline">\(y&#39;(x_0)
-\approx \frac{y_1 - y_{-1}}{2h} = \alpha&#39;\)</span>, lo que da <span
-class="math inline">\(y_{-1} = y_1 - 2h\,\alpha&#39;\)</span>.</li>
-<li>Aplicar la EDO en <span class="math inline">\(x_0\)</span> (ahora
-una incógnita) y sustituir la expresión del punto fantasma para eliminar
-<span class="math inline">\(y_{-1}\)</span>.</li>
+<li>Aproximar la derivada en <span class="math inline">\(x_0\)</span> con una diferencia centrada, <span class="math inline">\(y&#39;(x_0) \approx \frac{y_1 - y_{-1}}{2h} = \alpha&#39;\)</span>, lo que da <span class="math inline">\(y_{-1} = y_1 - 2h\,\alpha&#39;\)</span>.</li>
+<li>Aplicar la EDO en <span class="math inline">\(x_0\)</span> (ahora una incógnita) y sustituir la expresión del punto fantasma para eliminar <span class="math inline">\(y_{-1}\)</span>.</li>
 </ol>
-<p>Esto añade <span class="math inline">\(y_0\)</span> como incógnita
-(la matriz crece en una fila y una columna) y modifica la primera fila
-para incorporar la condición de Neumann. Una alternativa más sencilla
-pero de menor orden es la diferencia unilateral <span
-class="math inline">\(y&#39;(x_0) \approx \frac{y_1 - y_0}{h} =
-\alpha&#39;\)</span>, que da <span class="math inline">\(y_0 = y_1 -
-h\,\alpha&#39;\)</span> directamente pero reduce la precisión en el
-borde a <span class="math inline">\(\mathcal{O}(h)\)</span>.</p>
-<p>Las condiciones de <strong>Robin</strong> (<span
-class="math inline">\(c_1\,y(a) + c_2\,y&#39;(a) = \gamma\)</span>)
-combinan ambas: se usa la diferencia centrada con punto fantasma para
-<span class="math inline">\(y&#39;(a)\)</span>, se sustituye en la
-ecuación de Robin para eliminar <span
-class="math inline">\(y_{-1}\)</span> y se procede como en el caso de
-Neumann.</p>
+<p>Esto añade <span class="math inline">\(y_0\)</span> como incógnita (la matriz crece en una fila y una columna) y modifica la primera fila para incorporar la condición de Neumann. Una alternativa más sencilla pero de menor orden es la diferencia unilateral <span class="math inline">\(y&#39;(x_0) \approx \frac{y_1 - y_0}{h} = \alpha&#39;\)</span>, que da <span class="math inline">\(y_0 = y_1 - h\,\alpha&#39;\)</span> directamente pero reduce la precisión en el borde a <span class="math inline">\(\mathcal{O}(h)\)</span>.</p>
+<p>Las condiciones de <strong>Robin</strong> (<span class="math inline">\(c_1\,y(a) + c_2\,y&#39;(a) = \gamma\)</span>) combinan ambas — se usa la diferencia centrada con punto fantasma para <span class="math inline">\(y&#39;(a)\)</span>, se sustituye en la ecuación de Robin para eliminar <span class="math inline">\(y_{-1}\)</span> y se procede como en el caso de Neumann.</p>
 <hr />
-<h3 id="precisión-y-análisis-del-error">Precisión y análisis del
-error</h3>
-<p>Las aproximaciones en diferencias centradas para <span
-class="math inline">\(y&#39;\)</span> e <span
-class="math inline">\(y&#39;&#39;\)</span> tienen ambas <strong>error
-local de truncamiento</strong> <span
-class="math inline">\(\mathcal{O}(h^2)\)</span>. Al ensamblarlas en el
-sistema lineal completo de un PVF bien condicionado, el <strong>error
-global</strong> — la diferencia entre las soluciones numérica y exacta
-en cada punto de la malla — también es <span
-class="math inline">\(\mathcal{O}(h^2)\)</span>.</p>
-<p>Esto significa que <strong>dividir el paso <span
-class="math inline">\(h\)</span> a la mitad divide el error entre
-cuatro</strong> (el error escala como <span
-class="math inline">\(h^2\)</span>). Esta escala sirve como comprobación
-práctica de convergencia y resuelve el PVF con <span
-class="math inline">\(N\)</span> y <span
-class="math inline">\(2N\)</span> puntos. Si el error cae en un factor
-aproximado de 4, el esquema se comporta como predice la teoría. Si cae
-solo en un factor 2, puede estar dominando un tratamiento de borde de
-orden menor (p. ej. diferencias unilaterales en una condición de
-Neumann).</p>
-<p>En nuestro ejemplo guía con <span class="math inline">\(h =
-0.25\)</span>, el error máximo fue <span class="math inline">\(\approx
-0.0003\)</span>. Al refinar a <span class="math inline">\(h =
-0.125\)</span> (<span class="math inline">\(N = 8\)</span>) se reduciría
-a <span class="math inline">\(\approx 0.00008\)</span>.</p>
+<h3 id="precisión-y-análisis-del-error">Precisión y análisis del error</h3>
+<p>Las aproximaciones en diferencias centradas para <span class="math inline">\(y&#39;\)</span> e <span class="math inline">\(y&#39;&#39;\)</span> tienen ambas <strong>error local de truncamiento</strong> <span class="math inline">\(\mathcal{O}(h^2)\)</span>. Al ensamblarlas en el sistema lineal completo de un PVF bien condicionado, el <strong>error global</strong> — la diferencia entre las soluciones numérica y exacta en cada punto de la malla — también es <span class="math inline">\(\mathcal{O}(h^2)\)</span>.</p>
+<p>Esto significa que <strong>dividir el paso <span class="math inline">\(h\)</span> a la mitad divide el error entre cuatro</strong> (el error escala como <span class="math inline">\(h^2\)</span>). Esta escala sirve como comprobación práctica de convergencia y resuelve el PVF con <span class="math inline">\(N\)</span> y <span class="math inline">\(2N\)</span> puntos. Si el error cae en un factor aproximado de 4, el esquema se comporta como predice la teoría. Si cae solo en un factor 2, puede estar dominando un tratamiento de borde de orden menor (p. ej. diferencias unilaterales en una condición de Neumann).</p>
+<p>En nuestro ejemplo guía con <span class="math inline">\(h = 0.25\)</span>, el error máximo fue <span class="math inline">\(\approx 0.0003\)</span>. Al refinar a <span class="math inline">\(h = 0.125\)</span> (<span class="math inline">\(N = 8\)</span>) se reduciría a <span class="math inline">\(\approx 0.00008\)</span>.</p>
 <blockquote>
-<p><strong>Comprueba tu comprensión.</strong> Si duplicas <span
-class="math inline">\(N\)</span> (divides <span
-class="math inline">\(h\)</span> a la mitad) en el esquema MDF anterior,
-¿en qué factor debería decrecer el error máximo? Si el error en <span
-class="math inline">\(N = 4\)</span> es <span class="math inline">\(3
-\times 10^{-4}\)</span>, ¿qué error esperas en <span
-class="math inline">\(N = 8\)</span>?</p>
+<p><strong>Comprueba tu comprensión.</strong> Si duplicas <span class="math inline">\(N\)</span> (divides <span class="math inline">\(h\)</span> a la mitad) en el esquema MDF anterior, ¿en qué factor debería decrecer el error máximo? Si el error en <span class="math inline">\(N = 4\)</span> es <span class="math inline">\(3 \times 10^{-4}\)</span>, ¿qué error esperas en <span class="math inline">\(N = 8\)</span>?</p>
 </blockquote>
 <hr />
 <h2 id="comparación-disparo-vs.-mdf">Comparación: disparo vs. MDF</h2>
@@ -543,17 +303,13 @@ class="math inline">\(N = 8\)</span>?</p>
 <tbody>
 <tr class="odd">
 <td><strong>Idea central</strong></td>
-<td>Convertir el PVF en PVI; buscar la raíz para la pendiente
-desconocida</td>
-<td>Discretizar todo el dominio; resolver un sistema lineal
-acoplado</td>
+<td>Convertir el PVF en PVI; buscar la raíz para la pendiente desconocida</td>
+<td>Discretizar todo el dominio; resolver un sistema lineal acoplado</td>
 </tr>
 <tr class="even">
 <td><strong>Incógnitas</strong></td>
-<td>Un escalar <span class="math inline">\(s\)</span> (la pendiente
-desconocida)</td>
-<td>Todos los <span class="math inline">\(y_i\)</span> interiores
-simultáneamente</td>
+<td>Un escalar <span class="math inline">\(s\)</span> (la pendiente desconocida)</td>
+<td>Todos los <span class="math inline">\(y_i\)</span> interiores simultáneamente</td>
 </tr>
 <tr class="odd">
 <td><strong>Iteraciones</strong></td>
@@ -562,29 +318,23 @@ simultáneamente</td>
 </tr>
 <tr class="even">
 <td><strong>Precisión</strong></td>
-<td>Hereda el orden del integrador PVI (p. ej. RK4 = <span
-class="math inline">\(\mathcal{O}(h^4)\)</span>)</td>
-<td><span class="math inline">\(\mathcal{O}(h^2)\)</span> con
-diferencias centradas</td>
+<td>Hereda el orden del integrador PVI (p. ej. RK4 = <span class="math inline">\(\mathcal{O}(h^4)\)</span>)</td>
+<td><span class="math inline">\(\mathcal{O}(h^2)\)</span> con diferencias centradas</td>
 </tr>
 <tr class="odd">
 <td><strong>Condicionamiento</strong></td>
-<td>Puede amplificar errores al marchar hasta <span
-class="math inline">\(b\)</span></td>
+<td>Puede amplificar errores al marchar hasta <span class="math inline">\(b\)</span></td>
 <td>Depende del condicionamiento del sistema discreto</td>
 </tr>
 <tr class="even">
 <td><strong>Coste por paso</strong></td>
-<td>Bajo: reutiliza un integrador PVI existente</td>
-<td>Construir + resolver sistema tridiagonal (<span
-class="math inline">\(\mathcal{O}(N)\)</span>, Thomas)</td>
+<td>Bajo — reutiliza un integrador PVI existente</td>
+<td>Construir + resolver sistema tridiagonal (<span class="math inline">\(\mathcal{O}(N)\)</span>, Thomas)</td>
 </tr>
 <tr class="odd">
 <td><strong>EDO no lineales</strong></td>
-<td>Búsqueda de raíz en <span class="math inline">\(F(s)\)</span>
-(problema 1D)</td>
-<td>Iteración de Newton sobre el sistema completo
-(multidimensional)</td>
+<td>Búsqueda de raíz en <span class="math inline">\(F(s)\)</span> (problema 1D)</td>
+<td>Iteración de Newton sobre el sistema completo (multidimensional)</td>
 </tr>
 <tr class="even">
 <td><strong>Extensión a EDP</strong></td>
@@ -600,22 +350,8 @@ class="math inline">\(\mathcal{O}(N)\)</span>, Thomas)</td>
 </table>
 <hr />
 <h3 id="ventajas-y-desventajas">Ventajas y desventajas</h3>
-<p><strong>Método del disparo:</strong> * <strong>Ventajas:</strong>
-reutiliza integradores PVI bien probados y hereda su orden; para una EDO
-escalar de segundo orden, la búsqueda de raíces es unidimensional. *
-<strong>Desventajas:</strong> puede ser inestable en problemas rígidos
-(el integrador del PVI puede divergir antes de llegar a <span
-class="math inline">\(x = b\)</span>); sensible a la adivinanza inicial
-en problemas no lineales.</p>
-<p><strong>Método de Diferencias Finitas:</strong> *
-<strong>Ventajas:</strong> en problemas lineales requiere una sola
-resolución; trata todos los nodos simultáneamente y se extiende de forma
-natural a EDP. * <strong>Desventajas:</strong> construir las ecuaciones
-matriciales de EDO no lineales exige solucionadores iterativos como
-Newton–Raphson; el tamaño de malla <span
-class="math inline">\(h\)</span> debe ser suficientemente pequeño para
-la precisión deseada; menos preciso por grado de libertad que los
-métodos PVI de alto orden.</p>
+<p><strong>Método del disparo:</strong> * <strong>Ventajas:</strong> reutiliza integradores PVI bien probados y hereda su orden; para una EDO escalar de segundo orden, la búsqueda de raíces es unidimensional. * <strong>Desventajas:</strong> puede ser inestable en problemas rígidos (el integrador del PVI puede divergir antes de llegar a <span class="math inline">\(x = b\)</span>); sensible a la adivinanza inicial en problemas no lineales.</p>
+<p><strong>Método de Diferencias Finitas:</strong> * <strong>Ventajas:</strong> en problemas lineales requiere una sola resolución; trata todos los nodos simultáneamente y se extiende de forma natural a EDP. * <strong>Desventajas:</strong> construir las ecuaciones matriciales de EDO no lineales exige solucionadores iterativos como Newton–Raphson; el tamaño de malla <span class="math inline">\(h\)</span> debe ser suficientemente pequeño para la precisión deseada; menos preciso por grado de libertad que los métodos PVI de alto orden.</p>
 <nav class="chapnav"><a class="prev" href="04-CondicionesContorno.html">&larr; Condiciones de contorno</a><a class="index" href="index.html">&Iacute;ndice</a><a class="next" href="06-Autovalores.html">El método del disparo para problemas de autovalores &rarr;</a></nav>
 </body>
 </html>

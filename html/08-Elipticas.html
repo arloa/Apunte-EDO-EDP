@@ -4,175 +4,74 @@
   <meta charset="utf-8" />
   <meta name="generator" content="pandoc" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
-  <title>EDP Elípticas: Ecuación de Laplace</title>
+  <title>EDP El��pticas: Ecuaci��n de Laplace</title>
   <style>
     code{white-space: pre-wrap;}
     span.smallcaps{font-variant: small-caps;}
-    div.columns{display: flex; gap: min(4vw, 1.5em);}
-    div.column{flex: auto; overflow-x: auto;}
+    span.underline{text-decoration: underline;}
+    div.column{display: inline-block; vertical-align: top; width: 50%;}
     div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
-    /* The extra [class] is a hack that increases specificity enough to
-       override a similar rule in reveal.js */
-    ul.task-list[class]{list-style: none;}
-    ul.task-list li input[type="checkbox"] {
-      font-size: inherit;
-      width: 0.8em;
-      margin: 0 0.8em 0.2em -1.6em;
-      vertical-align: middle;
-    }
+    ul.task-list{list-style: none;}
   </style>
   <link rel="stylesheet" href="style.css" />
-  <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
-  <script
-  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"
-  type="text/javascript"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" type="text/javascript"></script>
 </head>
 <body>
 <nav class="chapnav"><a class="prev" href="07-EDP.html">&larr; Ecuaciones en Derivadas Parciales (EDP)</a><a class="index" href="index.html">&Iacute;ndice</a><a class="next" href="09-Parabolicas.html">EDP Parabólicas: Ecuación de Difusión &rarr;</a></nav>
 <nav id="TOC" role="doc-toc">
 <ul>
-<li><a href="#edp-elípticas-ecuación-de-laplace"
-id="toc-edp-elípticas-ecuación-de-laplace">EDP Elípticas: Ecuación de
-Laplace</a>
+<li><a href="#edp-elípticas-ecuación-de-laplace">EDP Elípticas: Ecuación de Laplace</a>
 <ul>
-<li><a href="#discretización-el-stencil-de-5-puntos"
-id="toc-discretización-el-stencil-de-5-puntos">Discretización: el
-stencil de 5 puntos</a></li>
-<li><a href="#ejemplo-guía-placa-con-temperatura-fija-en-los-bordes"
-id="toc-ejemplo-guía-placa-con-temperatura-fija-en-los-bordes">Ejemplo
-guía: placa con temperatura fija en los bordes</a></li>
-<li><a href="#resolución-1-método-directo"
-id="toc-resolución-1-método-directo">Resolución 1: método
-directo</a></li>
-<li><a href="#resolución-2-gaussseidel"
-id="toc-resolución-2-gaussseidel">Resolución 2: Gauss–Seidel</a></li>
-<li><a href="#más-allá-del-ejemplo" id="toc-más-allá-del-ejemplo">Más
-allá del ejemplo</a></li>
+<li><a href="#discretización-el-stencil-de-5-puntos">Discretización: el stencil de 5 puntos</a></li>
+<li><a href="#ejemplo-guía-placa-con-temperatura-fija-en-los-bordes">Ejemplo guía: placa con temperatura fija en los bordes</a></li>
+<li><a href="#resolución-1-método-directo">Resolución 1: método directo</a></li>
+<li><a href="#resolución-2-gaussseidel">Resolución 2: Gauss–Seidel</a></li>
+<li><a href="#más-allá-del-ejemplo">Más allá del ejemplo</a></li>
 </ul></li>
 </ul>
 </nav>
-<h1 id="edp-elípticas-ecuación-de-laplace">EDP Elípticas: Ecuación de
-Laplace</h1>
+<h1 id="edp-elípticas-ecuación-de-laplace">EDP Elípticas: Ecuación de Laplace</h1>
 <p>La ecuación de Laplace</p>
 <p><span class="math display">\[u_{xx} + u_{yy} = 0\]</span></p>
-<p>describe estados de <strong>equilibrio o estacionarios</strong>, como
-por ejemplo la distribución de temperatura en una placa, el potencial
-eléctrico en una región del espacio sin cargas en su interior, el flujo
-ideal. En las EDP elípticas, la solución en cada punto interior está
-acoplada con <em>todos</em> los demás y no hay una dirección
-privilegiada en la que «marchar». Los datos llegan como condiciones de
-contorno sobre <em>todo</em> el borde. Es la generalización natural a
-dos dimensiones del <a href="05-PVF.md">PVF por MDF</a>.</p>
+<p>describe estados de <strong>equilibrio o estacionarios</strong>, como por ejemplo la distribución de temperatura en una placa, el potencial eléctrico en una región del espacio sin cargas en su interior, el flujo ideal. En las EDP elípticas, la solución en cada punto interior está acoplada con <em>todos</em> los demás y no hay una dirección privilegiada en la que «marchar». Los datos llegan como condiciones de contorno sobre <em>todo</em> el borde. Es la generalización natural a dos dimensiones del <a href="05-PVF.md">PVF por MDF</a>.</p>
 <hr />
-<h2 id="discretización-el-stencil-de-5-puntos">Discretización: el
-stencil de 5 puntos</h2>
-<p>Sobre una malla uniforme <span class="math inline">\(x_i =
-i\,h\)</span>, <span class="math inline">\(y_j = j\,h\)</span>,
-reemplazamos cada derivada segunda por la diferencia centrada <span
-class="math inline">\(\mathcal{O}(h^2)\)</span> de <a
-href="05-PVF.md">PVF</a>. Al patrón de nodos que interviene en cada
-punto (la cruz de la figura) se lo llama <strong>stencil</strong>
-(«plantilla») y es el mismo en todos los nodos interiores.</p>
+<h2 id="discretización-el-stencil-de-5-puntos">Discretización: el stencil de 5 puntos</h2>
+<p>Sobre una malla uniforme <span class="math inline">\(x_i = i\,h\)</span>, <span class="math inline">\(y_j = j\,h\)</span>, reemplazamos cada derivada segunda por la diferencia centrada <span class="math inline">\(\mathcal{O}(h^2)\)</span> de <a href="05-PVF.md">PVF</a>. Al patrón de nodos que interviene en cada punto (la cruz de la figura) se lo llama <strong>stencil</strong> («plantilla») y es el mismo en todos los nodos interiores.</p>
 <figure>
-<img src="figs/stencil_laplace.png" style="width:50.0%"
-alt="Malla uniforme 3×3 con nodos etiquetados por sus índices. El stencil conecta u_{i,j} con sus cuatro vecinos. Las esquinas no participan" />
-<figcaption aria-hidden="true">Malla uniforme 3×3 con nodos etiquetados
-por sus índices. El stencil conecta <span
-class="math inline">\(u_{i,j}\)</span> con sus cuatro vecinos. Las
-esquinas no participan</figcaption>
+<img src="figs/stencil_laplace.png" style="width:50.0%" alt="" /><figcaption>Malla uniforme 3×3 con nodos etiquetados por sus índices. El stencil conecta <span class="math inline">\(u_{i,j}\)</span> con sus cuatro vecinos. Las esquinas no participan</figcaption>
 </figure>
-<p>La versión discreta de la ecuación de Laplace <span
-class="math display">\[u_{xx} + u_{yy} = 0\]</span> se obtiene al usar
-la aproximación de segunda derivada por diferencia centrada para ambas
-derivadas parciales:</p>
-<p><span class="math display">\[\frac{{\color{#1f77b4}u_{i+1,j}} -
-2{\color{#d62728}u_{i,j}} + {\color{#1f77b4}u_{i-1,j}}}{h^2} +
-\frac{{\color{#1f77b4}u_{i,j+1}} - 2{\color{#d62728}u_{i,j}} +
-{\color{#1f77b4}u_{i,j-1}}}{h^2} = 0\]</span></p>
+<p>La versión discreta de la ecuación de Laplace <span class="math display">\[u_{xx} + u_{yy} = 0\]</span> se obtiene al usar la aproximación de segunda derivada por diferencia centrada para ambas derivadas parciales:</p>
+<p><span class="math display">\[\frac{{\color{#1f77b4}u_{i+1,j}} - 2{\color{#d62728}u_{i,j}} + {\color{#1f77b4}u_{i-1,j}}}{h^2} + \frac{{\color{#1f77b4}u_{i,j+1}} - 2{\color{#d62728}u_{i,j}} + {\color{#1f77b4}u_{i,j-1}}}{h^2} = 0\]</span></p>
 <p>Despejando el punto central:</p>
-<p><span class="math display">\[\boxed{{\color{#d62728}u_{i,j}} =
-\frac{{\color{#1f77b4}u_{i+1,j}} + {\color{#1f77b4}u_{i-1,j}} +
-{\color{#1f77b4}u_{i,j+1}} +
-{\color{#1f77b4}u_{i,j-1}}}{4}}\]</span></p>
-<p><strong>Cada valor interior es el promedio de sus cuatro
-vecinos</strong> — la versión discreta de la propiedad del valor medio
-de las funciones armónicas.</p>
-<p>A partir de aquí el procedimiento es siempre el mismo, escribimos
-esta ecuación <strong>en cada nodo interior</strong> y obtenemos un
-sistema lineal con una ecuación por incógnita. Los vecinos que caen en
-el borde aportan su valor conocido, dado por las condiciones de
-contorno. El sistema se resuelve directamente o por iteración, como
-muestra el ejemplo siguiente.</p>
+<p><span class="math display">\[\boxed{{\color{#d62728}u_{i,j}} = \frac{{\color{#1f77b4}u_{i+1,j}} + {\color{#1f77b4}u_{i-1,j}} + {\color{#1f77b4}u_{i,j+1}} + {\color{#1f77b4}u_{i,j-1}}}{4}}\]</span></p>
+<p><strong>Cada valor interior es el promedio de sus cuatro vecinos</strong> — la versión discreta de la propiedad del valor medio de las funciones armónicas.</p>
+<p>A partir de aquí el procedimiento es siempre el mismo, escribimos esta ecuación <strong>en cada nodo interior</strong> y obtenemos un sistema lineal con una ecuación por incógnita. Los vecinos que caen en el borde aportan su valor conocido, dado por las condiciones de contorno. El sistema se resuelve directamente o por iteración, como muestra el ejemplo siguiente.</p>
 <hr />
-<h2 id="ejemplo-guía-placa-con-temperatura-fija-en-los-bordes">Ejemplo
-guía: placa con temperatura fija en los bordes</h2>
-<p>Placa cuadrada <span class="math inline">\([0,1] \times
-[0,1]\)</span> con condiciones de Dirichlet, borde superior a <span
-class="math inline">\(100\)</span>, los otros tres a <span
-class="math inline">\(0\)</span>. Con <span class="math inline">\(h =
-1/3\)</span> quedan <strong>4 nodos interiores</strong>:</p>
+<h2 id="ejemplo-guía-placa-con-temperatura-fija-en-los-bordes">Ejemplo guía: placa con temperatura fija en los bordes</h2>
+<p>Placa cuadrada <span class="math inline">\([0,1] \times [0,1]\)</span> con condiciones de Dirichlet, borde superior a <span class="math inline">\(100\)</span>, los otros tres a <span class="math inline">\(0\)</span>. Con <span class="math inline">\(h = 1/3\)</span> quedan <strong>4 nodos interiores</strong>:</p>
 <figure>
-<img src="figs/malla_laplace.png"
-alt="Malla 4×4 con h = 1/3. Los bordes son conocidos (100 arriba, 0 en el resto) y quedan cuatro incógnitas interiores u₁–u₄; la cruz verde marca el stencil de 5 puntos sobre u₁" />
-<figcaption aria-hidden="true">Malla 4×4 con h = 1/3. Los bordes son
-conocidos (100 arriba, 0 en el resto) y quedan cuatro incógnitas
-interiores u₁–u₄; la cruz verde marca el stencil de 5 puntos sobre
-u₁</figcaption>
+<img src="figs/malla_laplace.png" alt="" /><figcaption>Malla 4×4 con h = 1/3. Los bordes son conocidos (100 arriba, 0 en el resto) y quedan cuatro incógnitas interiores u₁–u₄; la cruz verde marca el stencil de 5 puntos sobre u₁</figcaption>
 </figure>
-<p>Aplicando el stencil en cada nodo (los vecinos en el borde ya son
-conocidos):</p>
+<p>Aplicando el stencil en cada nodo (los vecinos en el borde ya son conocidos):</p>
 <ul>
-<li><span class="math inline">\(u_1\)</span>: vecinos <span
-class="math inline">\(0,\; u_2,\; u_3,\; 0\)</span> → <span
-class="math inline">\(4u_1 - u_2 - u_3 + 0u_4 = 0\)</span></li>
-<li><span class="math inline">\(u_2\)</span>: vecinos <span
-class="math inline">\(u_1,\; 0,\; u_4,\; 0\)</span> → <span
-class="math inline">\(-u_1 + 4u_2 + 0u_3 - u_4 = 0\)</span></li>
-<li><span class="math inline">\(u_3\)</span>: vecinos <span
-class="math inline">\(0,\; u_4,\; 100,\; u_1\)</span> → <span
-class="math inline">\(-u_1 + 0u_2 + 4u_3 - u_4 = 100\)</span></li>
-<li><span class="math inline">\(u_4\)</span>: vecinos <span
-class="math inline">\(u_3,\; 0,\; 100,\; u_2\)</span> → <span
-class="math inline">\(0u_1 - u_2 - u_3 + 4u_4 = 100\)</span></li>
+<li><span class="math inline">\(u_1\)</span>: vecinos <span class="math inline">\(0,\; u_2,\; u_3,\; 0\)</span> → <span class="math inline">\(4u_1 - u_2 - u_3 + 0u_4 = 0\)</span></li>
+<li><span class="math inline">\(u_2\)</span>: vecinos <span class="math inline">\(u_1,\; 0,\; u_4,\; 0\)</span> → <span class="math inline">\(-u_1 + 4u_2 + 0u_3 - u_4 = 0\)</span></li>
+<li><span class="math inline">\(u_3\)</span>: vecinos <span class="math inline">\(0,\; u_4,\; 100,\; u_1\)</span> → <span class="math inline">\(-u_1 + 0u_2 + 4u_3 - u_4 = 100\)</span></li>
+<li><span class="math inline">\(u_4\)</span>: vecinos <span class="math inline">\(u_3,\; 0,\; 100,\; u_2\)</span> → <span class="math inline">\(0u_1 - u_2 - u_3 + 4u_4 = 100\)</span></li>
 </ul>
 <hr />
 <h2 id="resolución-1-método-directo">Resolución 1: método directo</h2>
-<p>En forma matricial <span class="math inline">\(A\mathbf{u} =
-\mathbf{b}\)</span>:</p>
-<p><span class="math display">\[\begin{bmatrix} 4 &amp; -1 &amp; -1
-&amp; 0 \\ -1 &amp; 4 &amp; 0 &amp; -1 \\ -1 &amp; 0 &amp; 4 &amp; -1 \\
-0 &amp; -1 &amp; -1 &amp; 4 \end{bmatrix} \begin{bmatrix} u_1 \\ u_2 \\
-u_3 \\ u_4 \end{bmatrix} = \begin{bmatrix} 0 \\ 0 \\ 100 \\ 100
-\end{bmatrix}\]</span></p>
-<p>La matriz es simétrica definida positiva y de diagonal dominante —
-estricta en este ejemplo, solo débil en mallas más finas — patrón
-general del stencil de 5 puntos. Resolviendo (por ejemplo, eliminación
-de Gauss, aprovechando la simetría izquierda–derecha <span
-class="math inline">\(u_1 = u_2\)</span>, <span
-class="math inline">\(u_3 = u_4\)</span>):</p>
-<p><span class="math display">\[u_1 = u_2 = \mathbf{12.5}, \qquad u_3 =
-u_4 = \mathbf{37.5}\]</span></p>
-<p>Los nodos junto al borde caliente quedan más calientes, como exige la
-física.</p>
-<p>El método directo resuelve exactamente el sistema discreto (no la EDP
-continua). Una eliminación densa cuesta <span
-class="math inline">\(\mathcal{O}(M^3)\)</span> para <span
-class="math inline">\(M\)</span> incógnitas y desperdicia la estructura
-dispersa; una malla <span class="math inline">\(100\times100\)</span> ya
-produce cerca de <span class="math inline">\(10^4\)</span>
-incógnitas.</p>
+<p>En forma matricial <span class="math inline">\(A\mathbf{u} = \mathbf{b}\)</span>:</p>
+<p><span class="math display">\[\begin{bmatrix} 4 &amp; -1 &amp; -1 &amp; 0 \\ -1 &amp; 4 &amp; 0 &amp; -1 \\ -1 &amp; 0 &amp; 4 &amp; -1 \\ 0 &amp; -1 &amp; -1 &amp; 4 \end{bmatrix} \begin{bmatrix} u_1 \\ u_2 \\ u_3 \\ u_4 \end{bmatrix} = \begin{bmatrix} 0 \\ 0 \\ 100 \\ 100 \end{bmatrix}\]</span></p>
+<p>La matriz es simétrica definida positiva y de diagonal dominante — estricta en este ejemplo, solo débil en mallas más finas — patrón general del stencil de 5 puntos. Resolviendo (por ejemplo, eliminación de Gauss, aprovechando la simetría izquierda–derecha <span class="math inline">\(u_1 = u_2\)</span>, <span class="math inline">\(u_3 = u_4\)</span>):</p>
+<p><span class="math display">\[u_1 = u_2 = \mathbf{12.5}, \qquad u_3 = u_4 = \mathbf{37.5}\]</span></p>
+<p>Los nodos junto al borde caliente quedan más calientes, como exige la física.</p>
+<p>El método directo resuelve exactamente el sistema discreto (no la EDP continua). Una eliminación densa cuesta <span class="math inline">\(\mathcal{O}(M^3)\)</span> para <span class="math inline">\(M\)</span> incógnitas y desperdicia la estructura dispersa; una malla <span class="math inline">\(100\times100\)</span> ya produce cerca de <span class="math inline">\(10^4\)</span> incógnitas.</p>
 <hr />
 <h2 id="resolución-2-gaussseidel">Resolución 2: Gauss–Seidel</h2>
-<p>En lugar de resolver el sistema de golpe, iteramos. Barrido tras
-barrido, cada nodo se actualiza con el promedio de sus vecinos
-<strong>usando siempre los valores más recientes</strong>:</p>
-<p><span class="math display">\[u_{i,j}^{(m+1)} = \frac{u_{i+1,j}^{(m)}
-+ u_{i-1,j}^{(m+1)} + u_{i,j+1}^{(m)} +
-u_{i,j-1}^{(m+1)}}{4}\]</span></p>
-<p>(es decir, vecinos aún no visitados en este barrido → valor antiguo
-<span class="math inline">\((m)\)</span>; ya visitados → valor nuevo
-<span class="math inline">\((m+1)\)</span>). Partiendo de <span
-class="math inline">\(\mathbf{u}^{(0)} = \mathbf{0}\)</span>:</p>
+<p>En lugar de resolver el sistema de golpe, iteramos. Barrido tras barrido, cada nodo se actualiza con el promedio de sus vecinos <strong>usando siempre los valores más recientes</strong>:</p>
+<p><span class="math display">\[u_{i,j}^{(m+1)} = \frac{u_{i+1,j}^{(m)} + u_{i-1,j}^{(m+1)} + u_{i,j+1}^{(m)} + u_{i,j-1}^{(m+1)}}{4}\]</span></p>
+<p>(es decir, vecinos aún no visitados en este barrido → valor antiguo <span class="math inline">\((m)\)</span>; ya visitados → valor nuevo <span class="math inline">\((m+1)\)</span>). Partiendo de <span class="math inline">\(\mathbf{u}^{(0)} = \mathbf{0}\)</span>:</p>
 <table>
 <thead>
 <tr class="header">
@@ -235,46 +134,20 @@ class="math inline">\(\mathbf{u}^{(0)} = \mathbf{0}\)</span>:</p>
 </tr>
 </tbody>
 </table>
-<p>Converge a la solución directa, como debe. El criterio de parada
-habitual es <span class="math inline">\(\max_{i,j}|u^{(m+1)} - u^{(m)}|
-&lt; \text{tol}\)</span>.</p>
-<p><em>Convergencia:</em> con condiciones de Dirichlet, la matriz del
-Laplaciano discreto (con el signo adoptado en el sistema) es simétrica
-definida positiva, lo que garantiza la convergencia de Gauss–Seidel. SOR
-acelera el barrido mediante <span
-class="math inline">\(u^{(m+1)}=(1-\omega)u^{(m)}+\omega
-u^{(m+1)}_{\mathrm{GS}}\)</span>; el valor óptimo de <span
-class="math inline">\(\omega\)</span> depende de la malla.</p>
+<p>Converge a la solución directa, como debe. El criterio de parada habitual es <span class="math inline">\(\max_{i,j}|u^{(m+1)} - u^{(m)}| &lt; \text{tol}\)</span>.</p>
+<p><em>Convergencia:</em> con condiciones de Dirichlet, la matriz del Laplaciano discreto (con el signo adoptado en el sistema) es simétrica definida positiva, lo que garantiza la convergencia de Gauss–Seidel. SOR acelera el barrido mediante <span class="math inline">\(u^{(m+1)}=(1-\omega)u^{(m)}+\omega u^{(m+1)}_{\mathrm{GS}}\)</span>; el valor óptimo de <span class="math inline">\(\omega\)</span> depende de la malla.</p>
 <blockquote>
-<p><strong>Comprueba tu comprensión.</strong> Calcula la iteración 7 a
-partir de la fila 6 y verifica que todos los valores están a menos de
-<span class="math inline">\(0.02\)</span> de la solución exacta.</p>
+<p><strong>Comprueba tu comprensión.</strong> Calcula la iteración 7 a partir de la fila 6 y verifica que todos los valores están a menos de <span class="math inline">\(0.02\)</span> de la solución exacta.</p>
 </blockquote>
 <figure>
-<img src="figs/laplace_placa.png"
-alt="Solución de Laplace en la placa con malla fina; los círculos marcan los cuatro nodos u_1–u_4 del ejemplo, a los que llegan tanto el método directo como Gauss–Seidel" />
-<figcaption aria-hidden="true">Solución de Laplace en la placa con malla
-fina; los círculos marcan los cuatro nodos <span
-class="math inline">\(u_1\)</span>–<span
-class="math inline">\(u_4\)</span> del ejemplo, a los que llegan tanto
-el método directo como Gauss–Seidel</figcaption>
+<img src="figs/laplace_placa.png" alt="" /><figcaption>Solución de Laplace en la placa con malla fina; los círculos marcan los cuatro nodos <span class="math inline">\(u_1\)</span>–<span class="math inline">\(u_4\)</span> del ejemplo, a los que llegan tanto el método directo como Gauss–Seidel</figcaption>
 </figure>
 <hr />
 <h2 id="más-allá-del-ejemplo">Más allá del ejemplo</h2>
 <ul>
-<li><strong>Mallas finas:</strong> con <span
-class="math inline">\(N\)</span> nodos interiores por lado, <span
-class="math inline">\(A\)</span> es de banda y muy dispersa (5 no nulos
-por fila); los métodos iterativos (Gauss–Seidel, SOR, gradiente
-conjugado) superan al directo tanto en memoria como en tiempo.</li>
-<li><strong>Neumann/Robin:</strong> si un borde fija flujo en lugar de
-temperatura, el valor en el borde pasa a ser incógnita y se usa el nodo
-fantasma de <a href="04-CondicionesContorno.md">Condiciones de
-contorno</a>.</li>
-<li><strong>Poisson:</strong> con fuente de calor interna, <span
-class="math inline">\(u_{xx} + u_{yy} = f(x,y)\)</span>, solo cambia el
-lado derecho: <span class="math inline">\(u_{i,j} =
-\tfrac{1}{4}(\text{vecinos}) - \tfrac{h^2}{4}f_{i,j}\)</span>.</li>
+<li><strong>Mallas finas:</strong> con <span class="math inline">\(N\)</span> nodos interiores por lado, <span class="math inline">\(A\)</span> es de banda y muy dispersa (5 no nulos por fila); los métodos iterativos (Gauss–Seidel, SOR, gradiente conjugado) superan al directo tanto en memoria como en tiempo.</li>
+<li><strong>Neumann/Robin:</strong> si un borde fija flujo en lugar de temperatura, el valor en el borde pasa a ser incógnita y se usa el nodo fantasma de <a href="04-CondicionesContorno.md">Condiciones de contorno</a>.</li>
+<li><strong>Poisson:</strong> con fuente de calor interna, <span class="math inline">\(u_{xx} + u_{yy} = f(x,y)\)</span>, solo cambia el lado derecho: <span class="math inline">\(u_{i,j} = \tfrac{1}{4}(\text{vecinos}) - \tfrac{h^2}{4}f_{i,j}\)</span>.</li>
 </ul>
 <nav class="chapnav"><a class="prev" href="07-EDP.html">&larr; Ecuaciones en Derivadas Parciales (EDP)</a><a class="index" href="index.html">&Iacute;ndice</a><a class="next" href="09-Parabolicas.html">EDP Parabólicas: Ecuación de Difusión &rarr;</a></nav>
 </body>

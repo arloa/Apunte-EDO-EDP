@@ -4,94 +4,38 @@
   <meta charset="utf-8" />
   <meta name="generator" content="pandoc" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
-  <title>El método del disparo para problemas de autovalores</title>
+  <title>El m��todo del disparo para problemas de autovalores</title>
   <style>
     code{white-space: pre-wrap;}
     span.smallcaps{font-variant: small-caps;}
-    div.columns{display: flex; gap: min(4vw, 1.5em);}
-    div.column{flex: auto; overflow-x: auto;}
+    span.underline{text-decoration: underline;}
+    div.column{display: inline-block; vertical-align: top; width: 50%;}
     div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
-    /* The extra [class] is a hack that increases specificity enough to
-       override a similar rule in reveal.js */
-    ul.task-list[class]{list-style: none;}
-    ul.task-list li input[type="checkbox"] {
-      font-size: inherit;
-      width: 0.8em;
-      margin: 0 0.8em 0.2em -1.6em;
-      vertical-align: middle;
-    }
+    ul.task-list{list-style: none;}
   </style>
   <link rel="stylesheet" href="style.css" />
-  <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
-  <script
-  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"
-  type="text/javascript"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" type="text/javascript"></script>
 </head>
 <body>
 <nav class="chapnav"><a class="prev" href="05-PVF.html">&larr; Problemas de Valores de Frontera</a><a class="index" href="index.html">&Iacute;ndice</a><a class="next" href="07-EDP.html">Ecuaciones en Derivadas Parciales (EDP) &rarr;</a></nav>
 <nav id="TOC" role="doc-toc">
 <ul>
-<li><a href="#el-método-del-disparo-para-problemas-de-autovalores"
-id="toc-el-método-del-disparo-para-problemas-de-autovalores">El método
-del disparo para problemas de autovalores</a>
+<li><a href="#el-método-del-disparo-para-problemas-de-autovalores">El método del disparo para problemas de autovalores</a>
 <ul>
-<li><a href="#qué-cambia-respecto-al-disparo-habitual"
-id="toc-qué-cambia-respecto-al-disparo-habitual">Qué cambia respecto al
-disparo habitual</a></li>
-<li><a href="#ejemplo-partícula-en-una-caja-unidimensional"
-id="toc-ejemplo-partícula-en-una-caja-unidimensional">Ejemplo: partícula
-en una caja unidimensional</a></li>
+<li><a href="#qué-cambia-respecto-al-disparo-habitual">Qué cambia respecto al disparo habitual</a></li>
+<li><a href="#ejemplo-partícula-en-una-caja-unidimensional">Ejemplo: partícula en una caja unidimensional</a></li>
 </ul></li>
 </ul>
 </nav>
-<h1 id="el-método-del-disparo-para-problemas-de-autovalores">El método
-del disparo para problemas de autovalores</h1>
-<p>En el <a href="05-PVF.md">PVF</a> las condiciones fijaban valores
-concretos en los bordes (<span
-class="math inline">\(y(a)=\alpha\)</span>, <span
-class="math inline">\(y(b)=\beta\)</span>) y quedaba una sola solución,
-que el disparo hallaba ajustando la pendiente <span
-class="math inline">\(s\)</span>. Un <strong>problema de
-autovalores</strong> cambia las reglas en dos aspectos: la EDO trae un
-parámetro libre <span class="math inline">\(\lambda\)</span>, y las
-condiciones de borde son <strong>homogéneas</strong>, es decir, piden
-que la solución valga cero en los extremos, sin fijar ningún valor
-(<span class="math inline">\(\gamma=0\)</span>; véase <a
-href="04-CondicionesContorno.md">condiciones de contorno</a>). Por
-ejemplo,</p>
-<p><span class="math display">\[y&#39;&#39; + \lambda y = 0, \qquad
-y(a)=y(b)=0.\]</span></p>
-<p>La función <span class="math inline">\(y\equiv0\)</span> satisface el
-problema para cualquier <span class="math inline">\(\lambda\)</span>. La
-pregunta útil es otra: <strong>¿para qué valores de <span
-class="math inline">\(\lambda\)</span> existe una solución no
-nula?</strong> Esos valores son los <strong>autovalores</strong> y las
-soluciones asociadas, las <strong>autofunciones</strong>.</p>
-<p>¿Por qué aparecen valores <em>aislados</em> y no un continuo? Piensa
-en una cuerda de guitarra clavada en sus dos extremos. <span
-class="math inline">\(\lambda\)</span> fija la longitud de onda con que
-oscila (más <span class="math inline">\(\lambda\)</span>, ondas más
-cortas). La cuerda vibra libremente, pero los dos clavos la fijan y la
-obligan a valer cero justo en <span class="math inline">\(x=a\)</span> y
-en <span class="math inline">\(x=b\)</span>. Para casi cualquier <span
-class="math inline">\(\lambda\)</span> la onda llega al segundo clavo a
-media altura y no se puede sujetar. Solo encajan las longitudes de onda
-en las que cabe <strong>un número entero de semiondas</strong> entre los
-extremos. Estos son el modo fundamental (media onda), el siguiente (una
-onda entera), y así sucesivamente. Esos pocos <span
-class="math inline">\(\lambda\)</span> que «afinan» son los autovalores.
-Esta es la misma razón por la que una cuerda suena en armónicos y no en
-cualquier tono.</p>
-<p>Las condiciones de contorno seleccionan así modos discretos de
-vibración, difusión o energía.</p>
+<h1 id="el-método-del-disparo-para-problemas-de-autovalores">El método del disparo para problemas de autovalores</h1>
+<p>En el <a href="05-PVF.md">PVF</a> las condiciones fijaban valores concretos en los bordes (<span class="math inline">\(y(a)=\alpha\)</span>, <span class="math inline">\(y(b)=\beta\)</span>) y quedaba una sola solución, que el disparo hallaba ajustando la pendiente <span class="math inline">\(s\)</span>. Un <strong>problema de autovalores</strong> cambia las reglas en dos aspectos: la EDO trae un parámetro libre <span class="math inline">\(\lambda\)</span>, y las condiciones de borde son <strong>homogéneas</strong>, es decir, piden que la solución valga cero en los extremos, sin fijar ningún valor (<span class="math inline">\(\gamma=0\)</span>; véase <a href="04-CondicionesContorno.md">condiciones de contorno</a>). Por ejemplo,</p>
+<p><span class="math display">\[y&#39;&#39; + \lambda y = 0, \qquad y(a)=y(b)=0.\]</span></p>
+<p>La función <span class="math inline">\(y\equiv0\)</span> satisface el problema para cualquier <span class="math inline">\(\lambda\)</span>. La pregunta útil es otra: <strong>¿para qué valores de <span class="math inline">\(\lambda\)</span> existe una solución no nula?</strong> Esos valores son los <strong>autovalores</strong> y las soluciones asociadas, las <strong>autofunciones</strong>.</p>
+<p>¿Por qué aparecen valores <em>aislados</em> y no un continuo? Piensa en una cuerda de guitarra clavada en sus dos extremos. <span class="math inline">\(\lambda\)</span> fija la longitud de onda con que oscila (más <span class="math inline">\(\lambda\)</span>, ondas más cortas). La cuerda vibra libremente, pero los dos clavos la fijan y la obligan a valer cero justo en <span class="math inline">\(x=a\)</span> y en <span class="math inline">\(x=b\)</span>. Para casi cualquier <span class="math inline">\(\lambda\)</span> la onda llega al segundo clavo a media altura y no se puede sujetar. Solo encajan las longitudes de onda en las que cabe <strong>un número entero de semiondas</strong> entre los extremos. Estos son el modo fundamental (media onda), el siguiente (una onda entera), y así sucesivamente. Esos pocos <span class="math inline">\(\lambda\)</span> que «afinan» son los autovalores. Esta es la misma razón por la que una cuerda suena en armónicos y no en cualquier tono.</p>
+<p>Las condiciones de contorno seleccionan así modos discretos de vibración, difusión o energía.</p>
 <hr />
-<h2 id="qué-cambia-respecto-al-disparo-habitual">Qué cambia respecto al
-disparo habitual</h2>
-<p>En <a href="05-PVF.md">PVF</a> el disparo ajustaba la pendiente
-inicial <span class="math inline">\(s\)</span> hasta que la trayectoria
-cumpliera el dato del otro extremo. Aquí la EDO ya trae un parámetro
-<span class="math inline">\(\lambda\)</span>, y son las condiciones
-homogéneas las que deben «cerrar» solas:</p>
+<h2 id="qué-cambia-respecto-al-disparo-habitual">Qué cambia respecto al disparo habitual</h2>
+<p>En <a href="05-PVF.md">PVF</a> el disparo ajustaba la pendiente inicial <span class="math inline">\(s\)</span> hasta que la trayectoria cumpliera el dato del otro extremo. Aquí la EDO ya trae un parámetro <span class="math inline">\(\lambda\)</span>, y son las condiciones homogéneas las que deben «cerrar» solas:</p>
 <table>
 <thead>
 <tr class="header">
@@ -124,92 +68,40 @@ homogéneas las que deben «cerrar» solas:</p>
 <tr class="odd">
 <td>Raíces</td>
 <td>una</td>
-<td>infinitas: <span
-class="math inline">\(\lambda_1&lt;\lambda_2&lt;\cdots\)</span></td>
+<td>infinitas: <span class="math inline">\(\lambda_1&lt;\lambda_2&lt;\cdots\)</span></td>
 </tr>
 <tr class="even">
 <td>Amplitud</td>
 <td>fijada por los datos</td>
-<td>libre → <span class="math inline">\(y&#39;(a)=1\)</span> +
-normalizar</td>
+<td>libre → <span class="math inline">\(y&#39;(a)=1\)</span> + normalizar</td>
 </tr>
 </tbody>
 </table>
 <ul>
-<li><strong>¿Por qué <span
-class="math inline">\(y&#39;(a)=1\)</span>?</strong> Con ecuación y
-condiciones homogéneas, si <span class="math inline">\(y\)</span> es
-solución también lo es <span class="math inline">\(Cy\)</span>: la
-amplitud nunca queda determinada. Fijar <span
-class="math inline">\(y&#39;(a)=1\)</span> (vale cualquier valor no
-nulo) solo evita la solución trivial; la escala física se recupera
-después normalizando.</li>
-<li><strong>¿Por qué no basta interpolar?</strong> En el PVF la EDO era
-lineal y <span class="math inline">\(F(s)\)</span> resultó una recta:
-dos disparos la determinaban. Aquí <span
-class="math inline">\(\lambda\)</span> entra dentro de la EDO (aparece
-como <span class="math inline">\(\sqrt{\lambda}\)</span> en senos y
-cosenos), así que <span class="math inline">\(F(\lambda)\)</span> es una
-función general: se barre en <span
-class="math inline">\(\lambda\)</span>, se detectan cambios de signo y
-cada raíz se refina con bisección o secante.</li>
-<li><strong>¿Cuál raíz?</strong> El barrido encuentra muchas. La
-autofunción del modo <span class="math inline">\(n\)</span> tiene <span
-class="math inline">\(n-1\)</span> nodos interiores (teorema de
-oscilación de Sturm–Liouville), lo que permite identificarla. Cuidado
-práctico: un paso de barrido demasiado grueso puede encerrar dos raíces
-en el mismo intervalo y no mostrar cambio de signo.</li>
+<li><strong>¿Por qué <span class="math inline">\(y&#39;(a)=1\)</span>?</strong> Con ecuación y condiciones homogéneas, si <span class="math inline">\(y\)</span> es solución también lo es <span class="math inline">\(Cy\)</span>: la amplitud nunca queda determinada. Fijar <span class="math inline">\(y&#39;(a)=1\)</span> (vale cualquier valor no nulo) solo evita la solución trivial; la escala física se recupera después normalizando.</li>
+<li><strong>¿Por qué no basta interpolar?</strong> En el PVF la EDO era lineal y <span class="math inline">\(F(s)\)</span> resultó una recta: dos disparos la determinaban. Aquí <span class="math inline">\(\lambda\)</span> entra dentro de la EDO (aparece como <span class="math inline">\(\sqrt{\lambda}\)</span> en senos y cosenos), así que <span class="math inline">\(F(\lambda)\)</span> es una función general: se barre en <span class="math inline">\(\lambda\)</span>, se detectan cambios de signo y cada raíz se refina con bisección o secante.</li>
+<li><strong>¿Cuál raíz?</strong> El barrido encuentra muchas. La autofunción del modo <span class="math inline">\(n\)</span> tiene <span class="math inline">\(n-1\)</span> nodos interiores (teorema de oscilación de Sturm–Liouville), lo que permite identificarla. Cuidado práctico: un paso de barrido demasiado grueso puede encerrar dos raíces en el mismo intervalo y no mostrar cambio de signo.</li>
 </ul>
-<p>Si la raíz es simple, el error de <span
-class="math inline">\(\lambda\)</span> hereda el orden del integrador:
-con RK4 decrece como <span
-class="math inline">\(\mathcal{O}(h^4)\)</span>. La alternativa es el
-MDF de <a href="05-PVF.md">PVF</a>: discretizar <span
-class="math inline">\(y&#39;&#39;\)</span> produce directamente un
-problema de autovalores para una matriz tridiagonal.</p>
+<p>Si la raíz es simple, el error de <span class="math inline">\(\lambda\)</span> hereda el orden del integrador: con RK4 decrece como <span class="math inline">\(\mathcal{O}(h^4)\)</span>. La alternativa es el MDF de <a href="05-PVF.md">PVF</a>: discretizar <span class="math inline">\(y&#39;&#39;\)</span> produce directamente un problema de autovalores para una matriz tridiagonal.</p>
 <hr />
-<h2 id="ejemplo-partícula-en-una-caja-unidimensional">Ejemplo: partícula
-en una caja unidimensional</h2>
-<p>La ecuación de Schrödinger independiente del tiempo para una
-partícula confinada entre paredes impenetrables es</p>
-<p><span
-class="math display">\[-\frac{\hbar^2}{2m}\,\psi&#39;&#39;(x)=E\,\psi(x),
-\qquad \psi(0)=\psi(L)=0,\]</span></p>
-<p>donde <span class="math inline">\(\psi\)</span> es la función de onda
-y <span class="math inline">\(E\)</span> la energía. Las condiciones
-expresan que la probabilidad se anula en las paredes.</p>
+<h2 id="ejemplo-partícula-en-una-caja-unidimensional">Ejemplo: partícula en una caja unidimensional</h2>
+<p>La ecuación de Schrödinger independiente del tiempo para una partícula confinada entre paredes impenetrables es</p>
+<p><span class="math display">\[-\frac{\hbar^2}{2m}\,\psi&#39;&#39;(x)=E\,\psi(x), \qquad \psi(0)=\psi(L)=0,\]</span></p>
+<p>donde <span class="math inline">\(\psi\)</span> es la función de onda y <span class="math inline">\(E\)</span> la energía. Las condiciones expresan que la probabilidad se anula en las paredes.</p>
 <h3 id="forma-simplificada">Forma simplificada</h3>
-<p>Para concentrarnos en el método tomamos una caja de longitud <span
-class="math inline">\(L=1\)</span> y agrupamos las constantes físicas
-en</p>
-<p><span
-class="math display">\[\lambda=\frac{2mE}{\hbar^2}.\]</span></p>
+<p>Para concentrarnos en el método tomamos una caja de longitud <span class="math inline">\(L=1\)</span> y agrupamos las constantes físicas en</p>
+<p><span class="math display">\[\lambda=\frac{2mE}{\hbar^2}.\]</span></p>
 <p>Así obtenemos directamente</p>
-<p><span class="math display">\[\psi&#39;&#39;+\lambda\psi=0, \qquad
-\psi(0)=\psi(1)=0.\]</span></p>
-<h3 id="disparo-con-psi01">Disparo con <span
-class="math inline">\(\psi&#39;(0)=1\)</span></h3>
-<p>Fijamos la escala provisional y resolvemos, para cada <span
-class="math inline">\(\lambda\)</span>,</p>
-<p><span class="math display">\[\psi&#39;&#39;=-\lambda\psi, \qquad
-\psi(0)=0, \qquad \psi&#39;(0)=1.\]</span></p>
-<p>El residuo es <span
-class="math inline">\(F(\lambda)=\psi(1;\lambda)\)</span>, la primera
-componente <span class="math inline">\(u_1\)</span> del sistema de
-primer orden de <a href="05-PVF.md">PVF</a>: si la trayectoria llega a
-cero sobre la pared derecha, <span
-class="math inline">\(\lambda\)</span> es un autovalor.</p>
+<p><span class="math display">\[\psi&#39;&#39;+\lambda\psi=0, \qquad \psi(0)=\psi(1)=0.\]</span></p>
+<h3 id="disparo-con-psi01">Disparo con <span class="math inline">\(\psi&#39;(0)=1\)</span></h3>
+<p>Fijamos la escala provisional y resolvemos, para cada <span class="math inline">\(\lambda\)</span>,</p>
+<p><span class="math display">\[\psi&#39;&#39;=-\lambda\psi, \qquad \psi(0)=0, \qquad \psi&#39;(0)=1.\]</span></p>
+<p>El residuo es <span class="math inline">\(F(\lambda)=\psi(1;\lambda)\)</span>, la primera componente <span class="math inline">\(u_1\)</span> del sistema de primer orden de <a href="05-PVF.md">PVF</a>: si la trayectoria llega a cero sobre la pared derecha, <span class="math inline">\(\lambda\)</span> es un autovalor.</p>
 <figure>
-<img src="figs/autovalores_disparo.png"
-alt="Trayectorias del disparo para tres valores de λ: solo λ = π² termina exactamente en ψ(1) = 0; por debajo llega arriba y por encima pasa de largo" />
-<figcaption aria-hidden="true">Trayectorias del disparo para tres
-valores de λ: solo λ = π² termina exactamente en ψ(1) = 0; por debajo
-llega arriba y por encima pasa de largo</figcaption>
+<img src="figs/autovalores_disparo.png" alt="" /><figcaption>Trayectorias del disparo para tres valores de λ: solo λ = π² termina exactamente en ψ(1) = 0; por debajo llega arriba y por encima pasa de largo</figcaption>
 </figure>
 <h3 id="barrido-numérico">Barrido numérico</h3>
-<p>Sin conocer solución cerrada, el procedimiento integra el PVI para
-una sucesión de valores de <span class="math inline">\(\lambda\)</span>
-y observa el signo de <span class="math inline">\(F\)</span>:</p>
+<p>Sin conocer solución cerrada, el procedimiento integra el PVI para una sucesión de valores de <span class="math inline">\(\lambda\)</span> y observa el signo de <span class="math inline">\(F\)</span>:</p>
 <table>
 <thead>
 <tr class="header">
@@ -236,32 +128,16 @@ y observa el signo de <span class="math inline">\(F\)</span>:</p>
 </tr>
 </tbody>
 </table>
-<p>El cambio de signo entre 9 y 16 encierra una raíz. Bisección o
-secante —evaluando <span class="math inline">\(F\)</span> siempre
-mediante el integrador— refinan el intervalo hasta <span
-class="math inline">\(\lambda_1\approx9.8696\)</span>.</p>
+<p>El cambio de signo entre 9 y 16 encierra una raíz. Bisección o secante —evaluando <span class="math inline">\(F\)</span> siempre mediante el integrador— refinan el intervalo hasta <span class="math inline">\(\lambda_1\approx9.8696\)</span>.</p>
 <figure>
-<img src="figs/autovalores_F.png"
-alt="Barrido numérico de F(λ): cada punto es una integración del PVI; los cambios de signo encierran las raíces λ₁, λ₂, λ₃" />
-<figcaption aria-hidden="true">Barrido numérico de F(λ): cada punto es
-una integración del PVI; los cambios de signo encierran las raíces λ₁,
-λ₂, λ₃</figcaption>
+<img src="figs/autovalores_F.png" alt="" /><figcaption>Barrido numérico de F(λ): cada punto es una integración del PVI; los cambios de signo encierran las raíces λ₁, λ₂, λ₃</figcaption>
 </figure>
-<p>Al continuar el barrido aparecen las raíces sucesivas <span
-class="math inline">\(\lambda_2, \lambda_3, \dots\)</span></p>
-<h3 id="verificación-con-la-solución-cerrada">Verificación con la
-solución cerrada</h3>
+<p>Al continuar el barrido aparecen las raíces sucesivas <span class="math inline">\(\lambda_2, \lambda_3, \dots\)</span></p>
+<h3 id="verificación-con-la-solución-cerrada">Verificación con la solución cerrada</h3>
 <p>En este ejemplo particular el PVI admite solución exacta,</p>
-<p><span
-class="math display">\[\psi(x;\lambda)=\frac{\sin(\sqrt{\lambda}\,x)}{\sqrt{\lambda}},
-\qquad
-F(\lambda)=\frac{\sin(\sqrt{\lambda})}{\sqrt{\lambda}},\]</span></p>
-<p>por lo que <span class="math inline">\(F(\lambda)=0\)</span> cuando
-<span class="math inline">\(\sqrt{\lambda}=n\pi\)</span>: los
-autovalores exactos son <span
-class="math inline">\(\boxed{\lambda_n=n^2\pi^2}\)</span>, con <span
-class="math inline">\(n=1,2,3,\dots\)</span> El barrido los
-reproduce:</p>
+<p><span class="math display">\[\psi(x;\lambda)=\frac{\sin(\sqrt{\lambda}\,x)}{\sqrt{\lambda}},
+\qquad F(\lambda)=\frac{\sin(\sqrt{\lambda})}{\sqrt{\lambda}},\]</span></p>
+<p>por lo que <span class="math inline">\(F(\lambda)=0\)</span> cuando <span class="math inline">\(\sqrt{\lambda}=n\pi\)</span>: los autovalores exactos son <span class="math inline">\(\boxed{\lambda_n=n^2\pi^2}\)</span>, con <span class="math inline">\(n=1,2,3,\dots\)</span> El barrido los reproduce:</p>
 <table>
 <thead>
 <tr class="header">
@@ -292,37 +168,17 @@ reproduce:</p>
 </tr>
 </tbody>
 </table>
-<p>Nada del procedimiento usó la solución exacta: el mismo barrido
-funciona para <span
-class="math inline">\(-\psi&#39;&#39;+V(x)\psi=E\psi\)</span>, donde en
-general no hay fórmula cerrada.</p>
-<h3 id="normalización-y-lectura-física">Normalización y lectura
-física</h3>
-<p>La condición <span class="math inline">\(\psi&#39;(0)=1\)</span> solo
-evitó la solución trivial. Para interpretar <span
-class="math inline">\(|\psi|^2\)</span> como densidad de probabilidad se
-impone después</p>
+<p>Nada del procedimiento usó la solución exacta: el mismo barrido funciona para <span class="math inline">\(-\psi&#39;&#39;+V(x)\psi=E\psi\)</span>, donde en general no hay fórmula cerrada.</p>
+<h3 id="normalización-y-lectura-física">Normalización y lectura física</h3>
+<p>La condición <span class="math inline">\(\psi&#39;(0)=1\)</span> solo evitó la solución trivial. Para interpretar <span class="math inline">\(|\psi|^2\)</span> como densidad de probabilidad se impone después</p>
 <p><span class="math display">\[\int_0^L|\psi(x)|^2\,dx=1
 \quad\Longrightarrow\quad
-\psi_n(x)=\sqrt{\frac{2}{L}}\sin\!\left(\frac{n\pi
-x}{L}\right).\]</span></p>
-<p>Al restituir la longitud general <span
-class="math inline">\(L\)</span>, las energías son</p>
-<p><span
-class="math display">\[E_n=\frac{n^2\pi^2\hbar^2}{2mL^2}.\]</span></p>
-<p>La ecuación admite ondas para cualquier <span
-class="math inline">\(E&gt;0\)</span>, pero la segunda pared exige que
-en <span class="math inline">\(x=L\)</span> haya un nodo. Solo las
-longitudes de onda que «caben» exactamente en la caja satisfacen ambas
-paredes: <strong>la cuantización aparece al imponer las condiciones de
-contorno</strong>.</p>
+\psi_n(x)=\sqrt{\frac{2}{L}}\sin\!\left(\frac{n\pi x}{L}\right).\]</span></p>
+<p>Al restituir la longitud general <span class="math inline">\(L\)</span>, las energías son</p>
+<p><span class="math display">\[E_n=\frac{n^2\pi^2\hbar^2}{2mL^2}.\]</span></p>
+<p>La ecuación admite ondas para cualquier <span class="math inline">\(E&gt;0\)</span>, pero la segunda pared exige que en <span class="math inline">\(x=L\)</span> haya un nodo. Solo las longitudes de onda que «caben» exactamente en la caja satisfacen ambas paredes: <strong>la cuantización aparece al imponer las condiciones de contorno</strong>.</p>
 <blockquote>
-<p><strong>Comprueba tu comprensión.</strong> ¿Por qué fijar <span
-class="math inline">\(\psi&#39;(0)=0\)</span> produciría siempre la
-solución trivial? Continuando el barrido de la tabla (<span
-class="math inline">\(\lambda=1,4,9,16,\dots\)</span>), ¿entre qué par
-de valores queda encerrada la raíz <span
-class="math inline">\(\lambda_2=4\pi^2\approx39.5\)</span>?</p>
+<p><strong>Comprueba tu comprensión.</strong> ¿Por qué fijar <span class="math inline">\(\psi&#39;(0)=0\)</span> produciría siempre la solución trivial? Continuando el barrido de la tabla (<span class="math inline">\(\lambda=1,4,9,16,\dots\)</span>), ¿entre qué par de valores queda encerrada la raíz <span class="math inline">\(\lambda_2=4\pi^2\approx39.5\)</span>?</p>
 </blockquote>
 <nav class="chapnav"><a class="prev" href="05-PVF.html">&larr; Problemas de Valores de Frontera</a><a class="index" href="index.html">&Iacute;ndice</a><a class="next" href="07-EDP.html">Ecuaciones en Derivadas Parciales (EDP) &rarr;</a></nav>
 </body>

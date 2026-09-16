@@ -343,8 +343,57 @@ def fig_euler_rigida():
             and abs(integrar(0.1, 10, True)[-1] - Bex(1)) / Bex(1) < 0.1)
 
 
+def fig_pvf_ejemplo():
+    # 05-PVF: solucion exacta y su derivada para y''=y, y(0)=0, y(1)=1.
+    # Muestra y(x)=sinh(x)/sinh(1) (condiciones de frontera) y y'(x)=cosh(x)/sinh(1)
+    # (pendiente inicial s*=1/sinh(1), incognita del metodo del disparo).
+    x = np.linspace(0, 1, 200)
+    s_star = 1 / np.sinh(1)
+    y = np.sinh(x) / np.sinh(1)
+    yp = np.cosh(x) / np.sinh(1)
+    fig, ax = plt.subplots(figsize=(6, 3.6))
+    ax.plot(x, y, "-", color="tab:blue", lw=2, label=r"$y(x)=\sinh(x)/\sinh(1)$")
+    ax.plot(x, yp, "--", color="tab:red", lw=2, label=r"$y'(x)=\cosh(x)/\sinh(1)$")
+    # Condiciones de frontera (datos)
+    ax.plot([0, 1], [0, 1], "ko", ms=7, zorder=5)
+    ax.annotate(r"$y(0)=0$", (0, 0), textcoords="offset points",
+                xytext=(8, 20))
+    ax.annotate(r"$y(1)=1$", (1, 1), textcoords="offset points",
+                xytext=(-45, 8))
+    # Pendiente inicial (incognita)
+    ax.plot([0], [s_star], "o", color="tab:red", ms=7, zorder=5)
+    ax.annotate(rf"$y'(0)=s^*\approx{s_star:.3f}$", (0, s_star),
+                textcoords="offset points", xytext=(8, -17), color="tab:red")
+    ax.set_xlabel("$x$"); ax.set_ylabel("$y$, $y'$")
+    ax.set_xlim(0, 1)
+    ax.set_title(r"Ejemplo guía: $y''=y$, $y(0)=0$, $y(1)=1$")
+    ax.legend(loc="upper left"); ax.grid(alpha=0.3)
+    fig.tight_layout(); fig.savefig(f"{FIGS}/pvf_ejemplo.png", dpi=150)
+    plt.close(fig)
+    return abs(s_star * np.sinh(1) - 1) < 1e-12 and abs(y[0]) < 1e-12 \
+        and abs(y[-1] - 1) < 1e-12
+
+
+def disparo_euler(s, h=0.5):
+    # Un "disparo" del ejemplo resuelto de 05-PVF: Euler adelante sobre
+    # u1'=u2, u2'=u1 con (u1,u2)(0) = (0,s). Devuelve (x, u1).
+    # Con h=0.5 son 2 pasos, igual que la cuenta a mano del capitulo.
+    n = int(round(1 / h))
+    x = np.linspace(0, 1, n + 1)
+    u = np.array([0.0, s])
+    f = lambda v: np.array([v[1], v[0]])
+    y = np.empty(n + 1)
+    y[0] = u[0]
+    for i in range(n):
+        u = u + h * f(u)
+        y[i + 1] = u[0]
+    return x, y
+
+
 def fig_disparo():
-    # 05-PVF: y''=y, trayectorias s*sinh(x) hacia y(1)=1
+    # 05-PVF: figura conceptual del metodo — trayectorias exactas
+    # y(x;s) = s*sinh(x): s1=0.5 corto, s2=1.3 se pasa, s*=1/sinh(1) da
+    # exactamente en beta. Ilustra el metodo con integracion ideal.
     x = np.linspace(0, 1, 200)
     s_star = 1 / np.sinh(1)
     fig, ax = plt.subplots(figsize=(6, 3.6))
@@ -362,6 +411,65 @@ def fig_disparo():
     fig.tight_layout(); fig.savefig(f"{FIGS}/disparo.png", dpi=150)
     plt.close(fig)
     return abs(s_star * np.sinh(1) - 1) < 1e-12
+
+
+def fig_disparo_euler():
+    # 05-PVF: disparos Euler (h=0.5) sobre y''=y — poligonales de 2 tramos
+    # que coinciden con la cuenta a mano del ejemplo resuelto: s1=0.5 llega
+    # a 0.5 (corto), s2=1.3 a 1.3 (se pasa) y s3=1 da en beta en el problema
+    # discretizado. La curva exacta queda de referencia (error del integrador).
+    xf = np.linspace(0, 1, 200)
+    fig, ax = plt.subplots(figsize=(6, 3.6))
+    ax.plot(xf, np.sinh(xf) / np.sinh(1), "k-", lw=2,
+            label=r"Exacta $\sinh(x)/\sinh(1)$")
+    for s, c, lab in [(0.5, "tab:blue", "$s_1=0.5$ (corto)"),
+                      (1.3, "tab:orange", "$s_2=1.3$ (se pasa)"),
+                      (1.0, "tab:green", "$s_3=1$ (da en $\\beta$)")]:
+        x, y = disparo_euler(s)
+        ax.plot(x, y, "o--", color=c, label=lab)
+    ax.axhline(1, color="k", lw=1, ls=":")
+    ax.plot([1], [1], "ko")
+    ax.annotate(r"$\beta = 1$", (1, 1), textcoords="offset points",
+                xytext=(-30, 8))
+    ax.set_xlabel("$x$"); ax.set_ylabel("$y$")
+    ax.set_title(r"Disparos con Euler $h=0.5$: $y''=y$, $y(0)=0$, $y(1)=1$")
+    ax.legend(loc="upper left"); ax.grid(alpha=0.3)
+    fig.tight_layout(); fig.savefig(f"{FIGS}/disparo_euler.png", dpi=150)
+    plt.close(fig)
+    _, y1 = disparo_euler(1.0)
+    _, y13 = disparo_euler(1.3)
+    return abs(y1[-1] - 1.0) < 1e-12 and abs(y13[-1] - 1.3) < 1e-12
+
+
+def fig_disparo_F():
+    # 05-PVF: residuo del disparo F(s) = y(1;s) - 1. Con Euler h=0.5 el
+    # residuo es la recta F_h(s) = s - 1: los disparos s1=0.5 y s2=1.3 la
+    # determinan y la secante cae en su raiz s3=1. El punto negro marca la
+    # raiz exacta s*=1/sinh(1): la diferencia es error del integrador.
+    # Los puntos y la raiz se calculan con disparo_euler, no hardcodeados.
+    _, y05 = disparo_euler(0.5)
+    _, y13 = disparo_euler(1.3)
+    F1, F2 = y05[-1] - 1, y13[-1] - 1
+    s3 = 0.5 - F1 * (1.3 - 0.5) / (F2 - F1)
+    s_star = 1 / np.sinh(1)
+    s = np.linspace(0, 1.6, 200)
+    fig, ax = plt.subplots(figsize=(6, 3.6))
+    ax.plot(s, s - 1, "k--", lw=2)
+    ax.plot([0.5], [F1], "o", color="tab:blue", ms=8)
+    ax.plot([1.3], [F2], "o", color="tab:orange", ms=8)
+    ax.annotate(rf"$(s_1, F_1)=(0.5, {F1:.1f})$", (0.5, F1), textcoords="offset points", xytext=(6, -16))
+    ax.annotate(rf"$(s_2, F_2)=(1.3, {F2:.1f})$", (1.3, F2), textcoords="offset points", xytext=(-95, 6), color="tab:orange")
+    ax.plot([s3], [0], "o", color="tab:green", ms=9, zorder=5)
+    ax.annotate(r"$s_3=1$ (raíz estimada x Euler)", (s3, 0), color="tab:green", textcoords="offset points", xytext=(8, -18))
+    ax.scatter([s_star], [0], s=100, c="k", zorder=5)
+    ax.annotate(rf"$s^*\approx{s_star:.3f}$ (raíz exacta)", (s_star, 0), textcoords="offset points", xytext=(-95, 10))
+    ax.axhline(0, color="k", lw=0.8)
+    ax.set_xlabel("$s$"); ax.set_ylabel("$F(s)$")
+    ax.set_title("El residuo del disparo: la secante halla la raíz de $F(s)$")
+    ax.legend(loc="lower right"); ax.grid(alpha=0.3)
+    fig.tight_layout(); fig.savefig(f"{FIGS}/disparo_F.png", dpi=150)
+    plt.close(fig)
+    return abs(s3 - 1.0) < 1e-12 and abs(s_star * np.sinh(1) - 1) < 1e-12
 
 
 def disparo_psi(lam, h=0.005):
@@ -776,6 +884,9 @@ if __name__ == "__main__":
         ("euler_estabilidad", fig_euler_estabilidad),
         ("euler_rigida", fig_euler_rigida),
         ("disparo", fig_disparo),
+        ("disparo_euler", fig_disparo_euler),
+        ("disparo_F", fig_disparo_F),
+        ("pvf_ejemplo", fig_pvf_ejemplo),
         ("autovalores_F", fig_autovalores_F),
         ("autovalores_disparo", fig_autovalores_disparo),
         ("laplace_placa", fig_laplace_placa),
