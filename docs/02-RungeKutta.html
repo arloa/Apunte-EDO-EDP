@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="es" xml:lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>Métodos de Runge–Kutta</title>
+  <style>
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <link rel="stylesheet" href="style.css" />
+  <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+  <script
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"
+  type="text/javascript"></script>
+</head>
+<body>
+<nav class="chapnav"><a class="prev" href="01-PVI.html">&larr; Problemas de Valor Inicial (PVI)</a><a class="index" href="index.html">&Iacute;ndice</a><a class="next" href="03-Estabilidad.html">Análisis de Estabilidad de los Métodos de Euler &rarr;</a></nav>
+<nav id="TOC" role="doc-toc">
+<ul>
+<li><a href="#métodos-de-rungekutta"
+id="toc-métodos-de-rungekutta">Métodos de Runge–Kutta</a>
+<ul>
+<li><a href="#rk2-el-método-del-punto-medio"
+id="toc-rk2-el-método-del-punto-medio">RK2: el método del punto
+medio</a></li>
+<li><a href="#rk4-rungekutta-de-cuarto-orden"
+id="toc-rk4-rungekutta-de-cuarto-orden">RK4: Runge–Kutta de cuarto
+orden</a></li>
+<li><a href="#métodos-implícitos-de-rungekutta-y-estabilidad"
+id="toc-métodos-implícitos-de-rungekutta-y-estabilidad">Métodos
+implícitos de Runge–Kutta y estabilidad</a></li>
+<li><a href="#resumen" id="toc-resumen">Resumen</a></li>
+</ul></li>
+</ul>
+</nav>
+<h1 id="métodos-de-rungekutta">Métodos de Runge–Kutta</h1>
+<p>En el capítulo anterior vimos Euler hacia adelante y hacia atrás.
+Ambos son <strong>métodos de paso único</strong> porque <span
+class="math inline">\(y_{n+1}\)</span> depende solo de <span
+class="math inline">\(y_n\)</span>. El primero se evalúa directamente y
+el segundo exige resolver una ecuación implícita. Su bajo orden de
+precisión motiva métodos más eficientes. Aquí estudiamos una de las
+familias de integradores de EDO más usadas, los <strong>métodos de
+Runge–Kutta multi-etapa</strong>.</p>
+<p>Los métodos de Runge–Kutta siguen siendo <em>de paso único</em>
+porque <span class="math inline">\(y_{n+1}\)</span> depende solo de
+<span class="math inline">\(y_n\)</span>. Las etapas son internas al
+paso, los métodos <em>Multi-paso</em> se refieren a otra familia, como
+los métodos de Adams, que reutilizan valores anteriores <span
+class="math inline">\(y_{n-1}, y_{n-2}, \dots\)</span>.</p>
+<p>En los métodos RK la idea clave es tomar varias evaluaciones <em>de
+prueba</em> de la pendiente dentro de un mismo paso y combinarlas en una
+media ponderada, logrando mayor precisión que Euler a costa de más
+evaluaciones de <span class="math inline">\(f\)</span> por paso.</p>
+<hr />
+<h2 id="rk2-el-método-del-punto-medio">RK2: el método del punto
+medio</h2>
+<p>Consideremos el problema de valor inicial de primer orden</p>
+<p><span class="math display">\[\frac{dy}{dx} = f(x, y), \quad y(x_0) =
+y_0\]</span></p>
+<p>Antes aproximamos la derivada con una diferencia finita evaluada al
+<em>inicio</em> (Euler adelante) o al <em>final</em> (Euler atrás) de
+cada intervalo. Ahora usamos la <strong>diferencia centrada</strong>
+entre los extremos <span class="math inline">\(x\)</span> y <span
+class="math inline">\(x + h\)</span>, que aproxima la derivada en el
+<strong>punto medio</strong> <span class="math inline">\(x +
+h/2\)</span> con error <span
+class="math inline">\(\mathcal{O}(h^2)\)</span> — la misma aproximación
+de <a href="05-PVF.md">PVF</a>:</p>
+<p><span class="math display">\[\frac{y(x + h) - y(x)}{h} =
+y&#39;\!\left(x + \tfrac{h}{2}\right) + \mathcal{O}(h^2) = f\!\left(x +
+\tfrac{h}{2},\; y\!\left(x + \tfrac{h}{2}\right)\right) +
+\mathcal{O}(h^2)\]</span></p>
+<p><span class="math display">\[\implies y(x + h) = y(x) + h\,f\!\left(x
++ \tfrac{h}{2},\; y\!\left(x + \tfrac{h}{2}\right)\right) +
+\mathcal{O}(h^3)\]</span></p>
+<p>La simetría alrededor del punto medio cancela el primer término de
+error del desarrollo de Taylor — la misma razón por la que la regla de
+cuadratura del punto medio supera a las de rectángulo izquierdo/derecho
+(véase <a href="01-PVI.md">PVI</a>).</p>
+<p>El problema es que no conocemos el valor de <span
+class="math inline">\(y(x + h/2)\)</span>. Lo estimamos con un paso
+intermedio de Euler adelante sobre medio intervalo:</p>
+<p><span class="math display">\[y\!\left(x + \tfrac{h}{2}\right) \approx
+y(x) + \tfrac{h}{2}\,f(x, y(x))\]</span></p>
+<p>Sustituyendo se obtiene el algoritmo de <strong>Runge–Kutta de dos
+etapas (RK2)</strong>, también llamado <em>método del punto
+medio</em>:</p>
+<p><span class="math display">\[y(x + h) \approx y(x) + h\,f\!\left(x +
+\tfrac{h}{2},\; y(x) + \tfrac{h}{2}\,f(x, y(x))\right)\]</span></p>
+<p>En una malla discreta <span class="math inline">\(x_0, x_1, \dots,
+x_{N}\)</span> con <span class="math inline">\(y_n \approx
+y(x_n)\)</span>, se escribe de forma compacta usando las
+<strong>etapas</strong> <span class="math inline">\(k_1,
+k_2\)</span>:</p>
+<p><span class="math display">\[y_{n+1} = y_n + h\,k_2\]</span></p>
+<p>donde</p>
+<p><span class="math display">\[k_1 = f(x_n, y_n)\]</span></p>
+<p><span class="math display">\[k_2 = f\!\left(x_n + \tfrac{h}{2},\; y_n
++ \tfrac{h}{2}\,k_1\right)\]</span></p>
+<ul>
+<li><span class="math inline">\(k_1\)</span> es la pendiente en el punto
+actual <span class="math inline">\((x_n, y_n)\)</span> — la misma que
+usaría Euler adelante para todo el paso.</li>
+<li><span class="math inline">\(k_2\)</span> es la pendiente en el punto
+medio <span class="math inline">\(x + h/2\)</span>, obtenida dando un
+medio paso con <span class="math inline">\(k_1\)</span> y reevaluando
+<span class="math inline">\(f\)</span> allí.</li>
+</ul>
+<p>Geométricamente, se da un medio paso de Euler para llegar al punto
+medio, se evalúa la pendiente allí y se usa <em>esa</em> pendiente para
+marchar el paso completo desde <span class="math inline">\(x_n\)</span>
+hasta <span class="math inline">\(x_{n+1}\)</span>.</p>
+<figure>
+<img src="figs/rk2_esquema.png"
+alt="Un paso de RK2 sobre y′ = −2y con y(0)=1 y h = 0.5. La pendiente k₁ en el inicio lleva por un rayo punteado al punto medio (hueco). La pendiente k₂ evaluada allí es la que usa la recta gruesa roja del avance real. El rombo gris marca dónde habría caído Euler puro con el mismo h" />
+<figcaption aria-hidden="true">Un paso de RK2 sobre y′ = −2y con y(0)=1
+y h = 0.5. La pendiente k₁ en el inicio lleva por un rayo punteado al
+punto medio (hueco). La pendiente k₂ evaluada allí es la que usa la
+recta gruesa roja del avance real. El rombo gris marca dónde habría
+caído Euler puro con el mismo h</figcaption>
+</figure>
+<h3 id="ejemplo-resuelto-rk2-sobre-y--2y">Ejemplo resuelto: RK2 sobre
+<span class="math inline">\(y&#39; = -2y\)</span></h3>
+<p>Continuando con el ejemplo guía de <a href="01-PVI.md">PVI</a> (<span
+class="math inline">\(y&#39; = -2y\)</span>, <span
+class="math inline">\(y(0) = 1\)</span>, <span class="math inline">\(h =
+0.1\)</span>, exacta <span class="math inline">\(y = e^{-2x}\)</span>),
+un paso desde <span class="math inline">\(x_0 = 0\)</span>:</p>
+<p><span class="math display">\[k_1 = f(0, 1) = -2, \qquad y_0 +
+\tfrac{h}{2}\,k_1 = 1 + \tfrac{0.1}{2}(-2) = 0.9\]</span></p>
+<p><span class="math display">\[k_2 = f(0.05,\; 0.9) = -1.8, \qquad y_1
+= 1 + 0.1 \cdot (-1.8) = \mathbf{0.82}\]</span></p>
+<p>El valor exacto es <span class="math inline">\(e^{-0.2} \approx
+0.8187\)</span>, así que el error es <span class="math inline">\(1.3
+\times 10^{-3}\)</span> — un orden de magnitud menor que los <span
+class="math inline">\(1.9 \times 10^{-2}\)</span> de Euler adelante y
+los <span class="math inline">\(1.5 \times 10^{-2}\)</span> de Euler
+atrás (véase la tabla en <a href="01-PVI.md">PVI</a>).</p>
+<hr />
+<h2 id="rk4-rungekutta-de-cuarto-orden">RK4: Runge–Kutta de cuarto
+orden</h2>
+<p>Cuando alguien habla de «el método de Runge–Kutta», casi siempre se
+refiere al esquema explícito de <strong>cuatro etapas y cuarto
+orden</strong> (RK4). Su alta precisión (error local <span
+class="math inline">\(\mathcal{O}(h^5)\)</span>) y su buena estabilidad
+lo convierten en la opción por defecto para problemas de EDO y EDP no
+rígidos en física e ingeniería.</p>
+<p>La actualización RK4 es</p>
+<p><span class="math display">\[y_{n+1} = y_n + \frac{h}{6}\left(k_1 +
+2k_2 + 2k_3 + k_4\right)\]</span></p>
+<p>donde las cuatro etapas son</p>
+<p><span class="math display">\[k_1 = f(x_n,\; y_n)\]</span></p>
+<p><span class="math display">\[k_2 = f\!\left(x_n + \tfrac{h}{2},\; y_n
++ \tfrac{h}{2}\,k_1\right)\]</span></p>
+<p><span class="math display">\[k_3 = f\!\left(x_n + \tfrac{h}{2},\; y_n
++ \tfrac{h}{2}\,k_2\right)\]</span></p>
+<p><span class="math display">\[k_4 = f\!\left(x_n + h,\; y_n +
+h\,k_3\right)\]</span></p>
+<p>Las cuatro etapas corresponden a cuatro estimaciones de la
+pendiente:</p>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Etapa</th>
+<th>Punto donde se evalúa <span class="math inline">\(f\)</span></th>
+<th>Significado</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><span class="math inline">\(k_1\)</span></td>
+<td><span class="math inline">\((x_n,\; y_n)\)</span></td>
+<td>Pendiente al inicio (pendiente de Euler)</td>
+</tr>
+<tr class="even">
+<td><span class="math inline">\(k_2\)</span></td>
+<td><span class="math inline">\((x_n + h/2,\; y_n + k_1
+h/2)\)</span></td>
+<td>Pendiente en el punto medio, usando <span
+class="math inline">\(k_1\)</span> para llegar</td>
+</tr>
+<tr class="odd">
+<td><span class="math inline">\(k_3\)</span></td>
+<td><span class="math inline">\((x_n + h/2,\; y_n + k_2
+h/2)\)</span></td>
+<td>Pendiente en el punto medio, usando <span
+class="math inline">\(k_2\)</span> para llegar (corregida)</td>
+</tr>
+<tr class="even">
+<td><span class="math inline">\(k_4\)</span></td>
+<td><span class="math inline">\((x_n + h,\; y_n + k_3 h)\)</span></td>
+<td>Pendiente al final, usando <span class="math inline">\(k_3\)</span>
+para llegar</td>
+</tr>
+</tbody>
+</table>
+<p>La actualización final es una media ponderada, donde las pendientes
+intermedias (<span class="math inline">\(k_2,k_3\)</span>) pesan el
+doble que las de los extremos (<span
+class="math inline">\(k_1,k_4\)</span>). Los pesos recuerdan a Simpson,
+pero los puntos en <span class="math inline">\(y\)</span> se construyen
+mediante etapas RK y no son los valores exactos de la trayectoria.</p>
+<figure>
+<img src="figs/rk4_esquema.png"
+alt="Un paso de RK4 sobre y′ = 2 − y, con y(0) = 0.5 y h = 1. Las cuatro pendientes de prueba k₁–k₄ (violeta) se evalúan en los puntos huecos que alcanzan los rayos punteados. El avance real es una única recta gruesa roja con la pendiente ponderada φ, en un paso tipo Euler que cae casi sobre la solución exacta" />
+<figcaption aria-hidden="true">Un paso de RK4 sobre y′ = 2 − y, con y(0)
+= 0.5 y h = 1. Las cuatro pendientes de prueba k₁–k₄ (violeta) se
+evalúan en los puntos huecos que alcanzan los rayos punteados. El avance
+real es una única recta gruesa roja con la pendiente ponderada φ, en un
+paso tipo Euler que cae casi sobre la solución exacta</figcaption>
+</figure>
+<h3 id="ejemplo-resuelto-rk4-sobre-y--2y">Ejemplo resuelto: RK4 sobre
+<span class="math inline">\(y&#39; = -2y\)</span></h3>
+<p>Un paso RK4 desde <span class="math inline">\(x_0 = 0\)</span> sobre
+el mismo problema:</p>
+<p><span class="math display">\[k_1 = f(0, 1) = -2\]</span></p>
+<p><span class="math display">\[k_2 = f(0.05,\; 0.9) = -1.8\]</span></p>
+<p><span class="math display">\[k_3 = f(0.05,\; 0.91) =
+-1.82\]</span></p>
+<p><span class="math display">\[k_4 = f(0.1,\; 0.818) =
+-1.636\]</span></p>
+<p><span class="math display">\[y_1 = 1 + \tfrac{0.1}{6}\bigl[-2 +
+2(-1.8) + 2(-1.82) + (-1.636)\bigr] = \mathbf{0.8187333}\]</span></p>
+<p>El error es <span class="math inline">\(\approx 2.6 \times
+10^{-6}\)</span>, unas <span class="math inline">\(500\)</span> veces
+menor que el de RK2. Sobre el problema modelo, el factor de
+amplificación de RK4 es <span class="math inline">\(R(z) = 1 + z + z^2/2
++ z^3/6 + z^4/24\)</span> con <span class="math inline">\(z = \lambda
+h\)</span> para la ecuación de prueba <span class="math inline">\(y&#39;
+= \lambda y\)</span> coincide con el desarrollo de Taylor de <span
+class="math inline">\(e^{z}\)</span> hasta el orden <span
+class="math inline">\(z^4\)</span>, con un resto <span
+class="math inline">\(\mathcal{O}(z^5)\)</span> — esta reproducción casi
+exacta de la exponencial en el primer paso explica los cinco decimales
+correctos observados.</p>
+<hr />
+<h2 id="métodos-implícitos-de-rungekutta-y-estabilidad">Métodos
+implícitos de Runge–Kutta y estabilidad</h2>
+<p>Tanto RK2 como RK4 son casos de una misma familia. Un método de
+Runge–Kutta general de <span class="math inline">\(s\)</span> etapas
+es</p>
+<p><span class="math display">\[y_{n+1} = y_n + h\sum_{i=1}^{s} b_i\,
+k_i, \qquad k_i = f\!\left(x_n + c_i h,\; y_n + h\sum_{j=1}^{s} a_{ij}\,
+k_j\right)\]</span></p>
+<p>Los coeficientes <span class="math inline">\(a_{ij}\)</span>, <span
+class="math inline">\(b_i\)</span>, <span
+class="math inline">\(c_i\)</span> definen el método; los <span
+class="math inline">\(a_{ij}\)</span> forman la <strong>matriz de
+etapas</strong> <span class="math inline">\(A\)</span>. RK2 y RK4 son
+los casos <strong>explícitos</strong>, el los que <span
+class="math inline">\(A\)</span> es triangular inferior (<span
+class="math inline">\(a_{ij} = 0\)</span> para <span
+class="math inline">\(j \ge i\)</span>), así que la suma de la
+definición solo recorre <span class="math inline">\(j &lt; i\)</span> —
+cada etapa depende de las anteriores y se calcula en secuencia. El
+Runge–Kutta <strong>implícito</strong> usa una matriz <span
+class="math inline">\(A\)</span> llena, donde <span
+class="math inline">\(k_i\)</span> puede depender de sí mismo y de
+etapas posteriores, de modo que las etapas forman un sistema acoplado de
+ecuaciones no lineales que debe resolverse simultáneamente en cada paso
+antes de producir <span class="math inline">\(y_{n+1}\)</span>.</p>
+<p>Esto encarece mucho cada paso, pero compra dos propiedades
+cruciales:</p>
+<ul>
+<li><p><strong>Estabilidad incondicional (A-estabilidad).</strong> Los
+métodos RK explícitos heredan la limitación fundamental de Euler
+adelante. Siempre hay un techo de tamaño de paso más allá del cual la
+solución diverge. Los métodos implícitos pueden construirse A-estables,
+lo cual es esencial para EDO <strong>rígidas</strong> (cinética química,
+combustión, simulación de circuitos, reacción–difusión), donde la tasa
+de decaimiento más rápida es órdenes de magnitud mayor que la más lenta
+y haría impracticable el paso de un método explícito.</p></li>
+<li><p><strong>Alta precisión con pasos grandes.</strong> Al no estar el
+tamaño de paso limitado por la estabilidad, se elige solo por criterios
+de precisión. En problemas rígidos esto suele suponer muchos menos pasos
+en total que con un método explícito, por lo que el mayor coste por paso
+queda sobradamente compensado.</p></li>
+</ul>
+<p>En la práctica la elección depende del problema. <strong>RK4
+explícito</strong> para problemas no rígidos, donde la precisión es el
+cuello de botella y el paso está lejos del límite de estabilidad;
+<strong>RK implícito</strong> para problemas rígidos, donde la
+estabilidad forzaría al método explícito a pasos inútilmente
+pequeños.</p>
+<hr />
+<h2 id="resumen">Resumen</h2>
+<p>Para la ecuación de prueba <span class="math inline">\(y&#39; =
+\lambda y\)</span> con <span
+class="math inline">\(\operatorname{Re}(\lambda) &lt; 0\)</span>:</p>
+<table>
+<colgroup>
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Método</th>
+<th>Etapas por paso</th>
+<th>Error local</th>
+<th>Error global</th>
+<th>Estabilidad</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Euler adelante</td>
+<td>1</td>
+<td><span class="math inline">\(\mathcal{O}(h^2)\)</span></td>
+<td><span class="math inline">\(\mathcal{O}(h)\)</span></td>
+<td>Condicional: <span class="math inline">\(h &lt;
+2/|\lambda|\)</span></td>
+</tr>
+<tr class="even">
+<td>RK2 (punto medio)</td>
+<td>2</td>
+<td><span class="math inline">\(\mathcal{O}(h^3)\)</span></td>
+<td><span class="math inline">\(\mathcal{O}(h^2)\)</span></td>
+<td>Mismo límite en el eje real que Euler (<span class="math inline">\(h
+&lt; 2/|\lambda|\)</span>); región mayor fuera del eje real</td>
+</tr>
+<tr class="odd">
+<td>RK4</td>
+<td>4</td>
+<td><span class="math inline">\(\mathcal{O}(h^5)\)</span></td>
+<td><span class="math inline">\(\mathcal{O}(h^4)\)</span></td>
+<td>Límite mayor en el eje real (<span class="math inline">\(h \lesssim
+2.78/|\lambda|\)</span>); región mucho mayor fuera del eje</td>
+</tr>
+<tr class="even">
+<td>RK implícito de Gauss</td>
+<td><span class="math inline">\(s\)</span> (acopladas)</td>
+<td><span class="math inline">\(\mathcal{O}(h^{2s+1})\)</span></td>
+<td><span class="math inline">\(\mathcal{O}(h^{2s})\)</span></td>
+<td>A-estable; no necesariamente L-estable</td>
+</tr>
+</tbody>
+</table>
+<figure>
+<img src="figs/rk_convergencia.png"
+alt="Error global en escala log-log frente a h para Euler, RK2 y RK4: las curvas siguen las pendientes h, h² y h⁴" />
+<figcaption aria-hidden="true">Error global en escala log-log frente a h
+para Euler, RK2 y RK4: las curvas siguen las pendientes h, h² y
+h⁴</figcaption>
+</figure>
+<p>El compromiso es <strong>precisión vs. coste</strong>, cada etapa
+explícita de Runge–Kutta exige una evaluación de <span
+class="math inline">\(f\)</span>, así que RK4 cuesta cuatro evaluaciones
+por paso. Pero su paso mucho mayor (a igual precisión) y su mejor
+estabilidad suelen hacerlo más barato en conjunto que Euler en cualquier
+problema donde la precisión importe. Para problemas rígidos, los métodos
+implícitos de Runge–Kutta cambian un coste por paso mucho mayor (una
+iteración de Newton en cada paso) por la libertad del techo de
+estabilidad — y ese intercambio es lo que hace los problemas rígidos
+tratables.</p>
+<p>En la práctica, integradores como <code>ode45</code> de MATLAB o
+<code>RK45</code> de SciPy usan <strong>pares encajados de órdenes 4 y
+5</strong>, el cual es un método de orden 5 corre junto a uno de orden
+4, su diferencia estima el error local y el tamaño de paso <span
+class="math inline">\(h\)</span> se adapta automáticamente para mantener
+ese error por debajo de una tolerancia. Esto combina la precisión de RK4
+con control automático del paso. El integrador da pasos grandes donde la
+solución es suave y pequeños donde cambia rápidamente.</p>
+<blockquote>
+<p><strong>Comprueba tu comprensión.</strong> En el ejemplo de RK4 el
+error con <span class="math inline">\(h = 0.1\)</span> fue <span
+class="math inline">\(\approx 2.6 \times 10^{-6}\)</span>. Sin rehacer
+las cuentas, ¿qué orden de magnitud de error esperarías con <span
+class="math inline">\(h = 0.05\)</span>? ¿Y con <span
+class="math inline">\(h = 0.2\)</span>?</p>
+</blockquote>
+<nav class="chapnav"><a class="prev" href="01-PVI.html">&larr; Problemas de Valor Inicial (PVI)</a><a class="index" href="index.html">&Iacute;ndice</a><a class="next" href="03-Estabilidad.html">Análisis de Estabilidad de los Métodos de Euler &rarr;</a></nav>
+</body>
+</html>

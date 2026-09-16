@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="es" xml:lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>Condiciones de contorno</title>
+  <style>
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <link rel="stylesheet" href="style.css" />
+  <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+  <script
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"
+  type="text/javascript"></script>
+</head>
+<body>
+<nav class="chapnav"><a class="prev" href="03-Estabilidad.html">&larr; Análisis de Estabilidad de los Métodos de Euler</a><a class="index" href="index.html">&Iacute;ndice</a><a class="next" href="05-PVF.html">Problemas de Valores de Frontera &rarr;</a></nav>
+<nav id="TOC" role="doc-toc">
+<ul>
+<li><a href="#condiciones-de-contorno"
+id="toc-condiciones-de-contorno">Condiciones de contorno</a>
+<ul>
+<li><a href="#cuántas-condiciones-y-dónde"
+id="toc-cuántas-condiciones-y-dónde">Cuántas condiciones y
+dónde</a></li>
+<li><a
+href="#ejemplo-guía-misma-edo-distintas-condiciones-distintas-soluciones"
+id="toc-ejemplo-guía-misma-edo-distintas-condiciones-distintas-soluciones">Ejemplo
+guía: misma EDO, distintas condiciones → distintas soluciones</a></li>
+<li><a href="#qué-se-calcula-con-ellas"
+id="toc-qué-se-calcula-con-ellas">Qué se calcula con ellas</a></li>
+<li><a href="#resumen-pvi-vs.-pvf" id="toc-resumen-pvi-vs.-pvf">Resumen:
+PVI vs. PVF</a></li>
+</ul></li>
+</ul>
+</nav>
+<h1 id="condiciones-de-contorno">Condiciones de contorno</h1>
+<p>En general, el comportamiento de un sistema no lo gobierna solo la
+ecuación diferencial, sino también las <strong>condiciones de
+contorno</strong> impuestas en los límites del dominio (<span
+class="math inline">\(x = a\)</span> y <span class="math inline">\(x =
+b\)</span>). Estas condiciones especifican cómo interactúa la variable
+de estado <span class="math inline">\(y\)</span> con su entorno en los
+bordes.</p>
+<p><strong>Forma unificada.</strong> Toda condición de contorno lineal
+en un extremo puede escribirse como</p>
+<p><span class="math display">\[\boxed{c_1\,y + c_2\,y&#39; =
+\gamma}\]</span></p>
+<p>donde <span class="math inline">\(c_1\)</span>, <span
+class="math inline">\(c_2\)</span> y <span
+class="math inline">\(\gamma\)</span> son constantes. La condición de
+contorno es una ecuación por cada extremo. La solución debe cumplir la
+EDO en todo el dominio y, además, esta ecuación puntual en cada borde.
+Si <span class="math inline">\(\gamma = 0\)</span> la condición es
+<strong>homogénea</strong> (no fija ningún valor) y <strong>no
+homogénea</strong> en caso contrario. Los tres tipos clásicos son
+simplemente elecciones especiales del par <span
+class="math inline">\((c_1, c_2)\)</span>:</p>
+<table>
+<colgroup>
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Tipo</th>
+<th>Coeficientes</th>
+<th>Condición</th>
+<th>Qué se fija</th>
+<th>Analogía del calor</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><strong>Dirichlet</strong></td>
+<td><span class="math inline">\((1,\, 0)\)</span></td>
+<td><span class="math inline">\(y = \gamma\)</span></td>
+<td>el valor de <span class="math inline">\(y\)</span></td>
+<td>temperatura fija</td>
+</tr>
+<tr class="even">
+<td><strong>Neumann</strong></td>
+<td><span class="math inline">\((0,\, 1)\)</span></td>
+<td><span class="math inline">\(y&#39; = \gamma\)</span></td>
+<td>la derivada (flujo) de <span class="math inline">\(y\)</span></td>
+<td>flujo fijo (aislado si <span class="math inline">\(\gamma =
+0\)</span>)</td>
+</tr>
+<tr class="odd">
+<td><strong>Robin</strong></td>
+<td><span class="math inline">\((c_1,\, c_2)\)</span> general</td>
+<td><span class="math inline">\(c_1 y + c_2 y&#39; =
+\gamma\)</span></td>
+<td>una combinación lineal</td>
+<td>enfriamiento convectivo</td>
+</tr>
+</tbody>
+</table>
+<p>Una condición <strong>mixta</strong> <em>no</em> es una cuarta
+elección de coeficientes — significa que se aplican tipos
+<em>distintos</em> en extremos <em>distintos</em> (p. ej. Dirichlet en
+<span class="math inline">\(x=a\)</span>, Neumann en <span
+class="math inline">\(x=b\)</span>). La terminología habla de
+<em>dónde</em> se sitúa cada condición, no de una nueva forma
+algebraica.</p>
+<hr />
+<h2 id="cuántas-condiciones-y-dónde">Cuántas condiciones y dónde</h2>
+<p>El orden de una ecuación diferencial dicta cuántas condiciones se
+necesitan para fijar una solución concreta, y eso determina directamente
+si el problema forma un <strong><a href="01-PVI.md">PVI</a></strong>
+(problema de valor inicial, todas las condiciones en un punto) o un
+<strong><a href="05-PVF.md">PVF</a></strong> (problema de valores de
+frontera, condiciones sobre los bordes del dominio).</p>
+<p><strong>Regla de conteo.</strong> Una EDO de orden <span
+class="math inline">\(n\)</span> necesita <strong><span
+class="math inline">\(n\)</span> condiciones independientes</strong>
+para determinar sus <span class="math inline">\(n\)</span> constantes de
+integración. Pueden darse en un punto o repartirse entre varios — en una
+EDO de 3er orden, por ejemplo, las tres en un punto (PVI) o dos en <span
+class="math inline">\(x=a\)</span> y una en <span
+class="math inline">\(x=b\)</span> (PVF) — aunque el conteo por sí solo
+no garantiza existencia ni unicidad. El disparo y el MDF se generalizan
+en consecuencia.</p>
+<ul>
+<li><strong>Las <span class="math inline">\(n\)</span> en un mismo
+punto</strong> <span class="math inline">\(x_0\)</span> →
+<strong>Problema de Valor Inicial (PVI)</strong>. Se da el estado
+inicial completo y se integra hacia adelante de forma única.</li>
+<li><strong>Repartidas entre dos o más puntos, o vinculándolos</strong>
+(periódicas, integrales) → <strong>Problema de Valores de Frontera
+(PVF)</strong>. Ningún punto tiene información suficiente para empezar a
+marchar.</li>
+</ul>
+<h3 id="primer-orden-y-fx-y">Primer orden (<span
+class="math inline">\(y&#39; = f(x, y)\)</span>)</h3>
+<p>Una constante <span class="math inline">\(C\)</span>, una condición
+necesaria.</p>
+<p><span class="math display">\[y&#39; + p(x)y = r(x), \quad y(x_0) =
+y_0\]</span></p>
+<p>Esto hace que las ecuaciones de 1er orden sean casi exclusivamente
+<strong>PVI</strong>. Intentar imponer dos condiciones de contorno —
+como <span class="math inline">\(y(a) = \alpha\)</span> e <span
+class="math inline">\(y(b) = \beta\)</span> — a una única EDO de 1er
+orden crea un <strong>sistema sobredeterminado</strong> y salvo que esos
+dos puntos caigan casualmente sobre la misma curva integral, no existe
+solución.</p>
+<p>Un <em>sistema</em> de EDO de 1er orden, en cambio, sí puede repartir
+condiciones entre bordes (p. ej. <span class="math inline">\(y_1(a) =
+\alpha\)</span> e <span class="math inline">\(y_2(b) = \beta\)</span>);
+y una única EDO de 1er orden admite un PVF solo si la condición vincula
+ambos extremos, como la periódica <span class="math inline">\(y(a) =
+y(b)\)</span>.</p>
+<h3 id="segundo-orden-y-fx-y-y">Segundo orden (<span
+class="math inline">\(y&#39;&#39; = f(x, y, y&#39;)\)</span>)</h3>
+<p>Dos constantes <span class="math inline">\(C_1, C_2\)</span>, dos
+condiciones necesarias.</p>
+<ul>
+<li><strong>PVI</strong> — ambas en el mismo punto <span
+class="math inline">\(x_0\)</span>:</li>
+</ul>
+<p><span class="math display">\[y&#39;&#39; + p(x)y&#39; + q(x)y = r(x),
+\quad y(x_0) = y_0, \quad y&#39;(x_0) = v_0\]</span></p>
+<p><em>Ejemplo:</em> movimiento parabólico — conoces dónde está la
+pelota en <span class="math inline">\(t = 0\)</span> (<span
+class="math inline">\(y_0\)</span>) y con qué velocidad se lanza (<span
+class="math inline">\(v_0\)</span>).</p>
+<ul>
+<li><strong>PVF</strong> — repartidas entre <span
+class="math inline">\(x = a\)</span> y <span class="math inline">\(x =
+b\)</span>:</li>
+</ul>
+<p><span class="math display">\[y&#39;&#39; + p(x)y&#39; + q(x)y = r(x),
+\quad y(a) = \alpha, \quad y(b) = \beta\]</span></p>
+<p><em>Ejemplo:</em> flexión de una viga — conoces la altura de la viga
+en el apoyo izquierdo (<span class="math inline">\(\alpha\)</span>) y en
+el derecho (<span class="math inline">\(\beta\)</span>).</p>
+<hr />
+<h2
+id="ejemplo-guía-misma-edo-distintas-condiciones-distintas-soluciones">Ejemplo
+guía: misma EDO, distintas condiciones → distintas soluciones</h2>
+<p>Para ver cómo el tipo de condición de contorno cambia la respuesta,
+usamos una EDO trivialmente resoluble, <span
+class="math inline">\(y&#39;&#39; = -1\)</span>. Esta ecuación describe
+la temperatura en estado estacionario (no cambia en el tiempo) <span
+class="math inline">\(y(x)\)</span> de una barra metálica que genera
+calor uniformemente en su interior, es decir, la ecuación de Poisson en
+una dimensión, la misma que reaparece en 2D en <a
+href="08-Elipticas.md">Elípticas</a>. Integrando dos veces se obtiene la
+solución general <span class="math inline">\(y(x) = -\tfrac{1}{2}x^2 +
+C_1 x + C_2\)</span>. Las condiciones de contorno fijan por completo las
+constantes:</p>
+<table>
+<colgroup>
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Condiciones de contorno</th>
+<th>Constantes</th>
+<th>Solución</th>
+<th>Interpretación</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><span class="math inline">\(y(0) = 0,\; y(1) = 0\)</span>
+(Dirichlet)</td>
+<td><span class="math inline">\(C_2 = 0,\; C_1 =
+\tfrac{1}{2}\)</span></td>
+<td><span class="math inline">\(y = \tfrac{1}{2}x(1-x)\)</span></td>
+<td>ambos extremos a temperatura fija, el calor sale por los dos, arco
+simétrico</td>
+</tr>
+<tr class="even">
+<td><span class="math inline">\(y(0) = 0,\; y&#39;(1) = 0\)</span>
+(mixta)</td>
+<td><span class="math inline">\(C_2 = 0,\; C_1 = 1\)</span></td>
+<td><span class="math inline">\(y = x - \tfrac{x^2}{2}\)</span></td>
+<td>extremo derecho aislado, el calor solo sale por la izquierda, la
+barra queda más caliente</td>
+</tr>
+<tr class="odd">
+<td><span class="math inline">\(y&#39;(0) = 0,\; y&#39;(1) = 0\)</span>
+(Neumann)</td>
+<td><span class="math inline">\(C_1 = 0\)</span>, luego <span
+class="math inline">\(y&#39;(1) = -1 \neq 0\)</span></td>
+<td><strong>no hay solución</strong></td>
+<td>ambos extremos aislados: la fuente calienta sin poder evacuar</td>
+</tr>
+</tbody>
+</table>
+<p>La tercera fila muestra que contar dos condiciones no basta: de <span
+class="math inline">\(y&#39;=-x+C_1\)</span>, el borde izquierdo exige
+<span class="math inline">\(C_1=0\)</span> y el derecho exigiría <span
+class="math inline">\(C_1=1\)</span>. Físicamente, la fuente genera
+calor que no puede salir por ningún extremo aislado, así que no existe
+estado estacionario. En general, las condiciones de Neumann en ambos
+extremos requieren una condición de compatibilidad, el calor generado
+debe igualar el flujo que sale, si se cumple, la solución queda
+determinada salvo una constante (por ejemplo, <span
+class="math inline">\(y&#39;&#39;=0\)</span> admite cualquier <span
+class="math inline">\(y=C\)</span>).</p>
+<figure>
+<img src="figs/cc_ejemplo.png"
+alt="Las dos soluciones de y′′ = −1. En azul, el arco simétrico con ambos extremos a temperatura fija. En naranja, la curva es asimétrica con el extremo derecho aislado. La pendiente nula en el borde significa flujo de calor nulo a través de él, ni entra ni sale calor. El caso Neumann puro con ambos extremos aislados no tiene curva que dibujar. En equilibrio todo el calor generado debe salir por los bordes, y con flujo nulo en ambos el balance es imposible" />
+<figcaption aria-hidden="true">Las dos soluciones de y′′ = −1. En azul,
+el arco simétrico con ambos extremos a temperatura fija. En naranja, la
+curva es asimétrica con el extremo derecho aislado. La pendiente nula en
+el borde significa flujo de calor nulo a través de él, ni entra ni sale
+calor. El caso Neumann puro con ambos extremos aislados no tiene curva
+que dibujar. En equilibrio todo el calor generado debe salir por los
+bordes, y con flujo nulo en ambos el balance es imposible</figcaption>
+</figure>
+<blockquote>
+<p><strong>Comprueba tu comprensión.</strong> Manteniendo el extremo
+izquierdo aislado (<span class="math inline">\(y&#39;(0) = 0\)</span>),
+¿qué condición en <span class="math inline">\(x = 1\)</span> sí
+produciría solución? ¿Qué valor del flujo saliente equilibraría a la
+fuente?</p>
+</blockquote>
+<hr />
+<h2 id="qué-se-calcula-con-ellas">Qué se calcula con ellas</h2>
+<p>Este es un apunte de métodos numéricos, así que la recompensa está en
+cómo entra cada tipo de condición en los métodos. La misma forma
+unificada <span class="math inline">\(c_1 y + c_2 y&#39; =
+\gamma\)</span> aparece tanto en el residuo del disparo como en la
+matriz del MDF.</p>
+<h3 id="método-del-disparo-residuo-por-tipo-de-condición">Método del
+disparo — residuo por tipo de condición</h3>
+<p>En el método del disparo se adivina la pendiente desconocida <span
+class="math inline">\(s\)</span>, se integra el PVI hasta <span
+class="math inline">\(x = b\)</span> y se busca la raíz del residuo
+<span class="math inline">\(F(s)\)</span>. La forma de <span
+class="math inline">\(F(s)\)</span> depende de la condición en <span
+class="math inline">\(x = b\)</span>:</p>
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Condición en <span class="math inline">\(x = b\)</span></th>
+<th>Residuo <span class="math inline">\(F(s)\)</span> cuya raíz se
+busca</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Dirichlet <span class="math inline">\(y(b) = \beta\)</span></td>
+<td><span class="math inline">\(u_1(b; s) - \beta\)</span></td>
+</tr>
+<tr class="even">
+<td>Neumann <span class="math inline">\(y&#39;(b) = \beta\)</span></td>
+<td><span class="math inline">\(u_2(b; s) - \beta\)</span></td>
+</tr>
+<tr class="odd">
+<td>Robin <span class="math inline">\(c_1 y(b) + c_2 y&#39;(b) =
+\gamma\)</span></td>
+<td><span class="math inline">\(c_1\,u_1(b; s) + c_2\,u_2(b; s) -
+\gamma\)</span></td>
+</tr>
+</tbody>
+</table>
+<p>donde <span class="math inline">\(u_1 = y\)</span> y <span
+class="math inline">\(u_2 = y&#39;\)</span> son las variables del
+sistema de primer orden. La condición en <span class="math inline">\(x =
+a\)</span> va incorporada a la condición inicial del PVI; la de <span
+class="math inline">\(x = b\)</span> define <span
+class="math inline">\(F(s)\)</span>. Las condiciones de Robin no son más
+difíciles que las de Dirichlet — solo una combinación lineal distinta de
+los mismos dos valores en el extremo.</p>
+<h3 id="método-de-diferencias-finitas-tratamiento-en-la-matriz">Método
+de Diferencias Finitas — tratamiento en la matriz</h3>
+<p>En el MDF una condición Dirichlet ya da el valor del borde, así que
+no entra como incógnita y solo aparece como dato en el lado derecho del
+sistema. Con Neumann o Robin el valor del borde es desconocido, de modo
+que se suma una incógnita y una ecuación extra a la matriz (los
+detalles, con el nodo fantasma, en <a href="05-PVF.md">PVF</a>).</p>
+<hr />
+<h2 id="resumen-pvi-vs.-pvf">Resumen: PVI vs. PVF</h2>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Rasgo</th>
+<th>Problema de Valor Inicial (PVI)</th>
+<th>Problema de Valores de Frontera (PVF)</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><strong>Ubicación de las condiciones</strong></td>
+<td>Todas en <strong>un punto</strong> (<span class="math inline">\(x =
+a\)</span>)</td>
+<td>Repartidas entre <strong>varios puntos</strong> (<span
+class="math inline">\(x = a\)</span> y <span class="math inline">\(x =
+b\)</span>)</td>
+</tr>
+<tr class="even">
+<td><strong>Contexto físico</strong></td>
+<td>Dinámica temporal / evolutiva (movimiento, decaimiento,
+órbitas)</td>
+<td>Estados espaciales / de equilibrio (distribución de calor, modos de
+onda)</td>
+</tr>
+<tr class="odd">
+<td><strong>Resolubilidad</strong></td>
+<td>Casi siempre da solución única</td>
+<td>Puede tener 0, 1 o infinitas soluciones</td>
+</tr>
+<tr class="even">
+<td><strong>Enfoque numérico</strong></td>
+<td>Marcha hacia adelante paso a paso (Euler, RK4)</td>
+<td>Disparo o sistema global MDF</td>
+</tr>
+</tbody>
+</table>
+<p>Las mismas tres condiciones reaparecen en las EDP, ahora aplicadas
+sobre los bordes del dominio espacial. Allí el borde ya no es un punto
+sino una curva, y el dato es una función entera sobre él, como la
+temperatura del borde de la placa en <a
+href="08-Elipticas.md">Elípticas</a> o el contorno de la difusión en <a
+href="09-Parabolicas.md">Parabólicas</a>.</p>
+<nav class="chapnav"><a class="prev" href="03-Estabilidad.html">&larr; Análisis de Estabilidad de los Métodos de Euler</a><a class="index" href="index.html">&Iacute;ndice</a><a class="next" href="05-PVF.html">Problemas de Valores de Frontera &rarr;</a></nav>
+</body>
+</html>
