@@ -4,100 +4,279 @@
   <meta charset="utf-8" />
   <meta name="generator" content="pandoc" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
-  <title>EDP Parab��licas: Ecuaci��n de Difusi��n</title>
+  <title>EDP Parabólicas: Ecuación de Difusión</title>
   <style>
     code{white-space: pre-wrap;}
     span.smallcaps{font-variant: small-caps;}
-    span.underline{text-decoration: underline;}
-    div.column{display: inline-block; vertical-align: top; width: 50%;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
     div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
-    ul.task-list{list-style: none;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
   </style>
   <link rel="stylesheet" href="style.css" />
-  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" type="text/javascript"></script>
+  <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+  <script
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"
+  type="text/javascript"></script>
 </head>
 <body>
 <nav class="chapnav"><a class="prev" href="08-Elipticas.html">&larr; EDP Elípticas: Ecuación de Laplace</a><a class="index" href="index.html">&Iacute;ndice</a><span></span></nav>
 <nav id="TOC" role="doc-toc">
 <ul>
-<li><a href="#edp-parabólicas-ecuación-de-difusión">EDP Parabólicas: Ecuación de Difusión</a>
+<li><a href="#edp-parabólicas-ecuación-de-difusión"
+id="toc-edp-parabólicas-ecuación-de-difusión">EDP Parabólicas: Ecuación
+de Difusión</a>
 <ul>
-<li><a href="#esquema-explícito-ftcs">Esquema explícito FTCS</a></li>
-<li><a href="#método-de-cranknicolson-cn">Método de Crank–Nicolson (CN)</a></li>
-<li><a href="#comparación">Comparación</a></li>
+<li><a href="#esquema-explícito-ftcs"
+id="toc-esquema-explícito-ftcs">Esquema explícito FTCS</a></li>
+<li><a href="#método-de-cranknicolson-cn"
+id="toc-método-de-cranknicolson-cn">Método de Crank–Nicolson
+(CN)</a></li>
+<li><a href="#comparación" id="toc-comparación">Comparación</a></li>
 </ul></li>
 </ul>
 </nav>
-<h1 id="edp-parabólicas-ecuación-de-difusión">EDP Parabólicas: Ecuación de Difusión</h1>
-<p>Las <strong>EDP parabólicas</strong> describen fenómenos que <strong>evolucionan en una dirección privilegiada</strong> (generalmente el tiempo) a partir de una condición inicial, con condiciones de contorno en el espacio. Su ejemplo canónico es la ecuación de difusión.</p>
-<p><span class="math display">\[u_t = D\,u_{xx}, \quad x \in [0, 1],\; t &gt; 0\]</span></p>
-<p>Esta ecuación lleva una distribución inicial <span class="math inline">\(u(x, 0)\)</span> hacia el equilibrio. El estado final es la solución de la elíptica asociada (<span class="math inline">\(u_{xx} = 0\)</span>, una recta entre las temperaturas de los extremos). El calor es solo el ejemplo físico habitual, la misma ecuación modela la difusión de un contaminante o el transporte de momento por viscosidad. Numéricamente combina los dos mundos de los capítulos anteriores, <strong>diferencias finitas en el espacio</strong> (como en <a href="05-PVF.md">PVF</a>) + <strong>marcha en el tiempo</strong> (como en <a href="01-PVI.md">PVI</a>).</p>
-<p>Notación: <span class="math inline">\(h\)</span> = paso espacial, <span class="math inline">\(k\)</span> = paso temporal, <span class="math inline">\(u_{i,j} \approx u(x_i, t_j)\)</span> — convención de <a href="07-EDP.md">EDP</a>; aquí <span class="math inline">\(j\)</span> recorre el <em>tiempo</em>, no una segunda dirección espacial como en <a href="08-Elipticas.md">Elípticas</a>.</p>
+<h1 id="edp-parabólicas-ecuación-de-difusión">EDP Parabólicas: Ecuación
+de Difusión</h1>
+<p>Las <strong>EDP parabólicas</strong> describen fenómenos que
+<strong>evolucionan en una dirección privilegiada</strong> (generalmente
+el tiempo) a partir de una condición inicial, con condiciones de
+contorno en el espacio. Su ejemplo canónico es la ecuación de
+difusión.</p>
+<p><span class="math display">\[u_t = D\,u_{xx}, \quad x \in [0, 1],\; t
+&gt; 0\]</span></p>
+<p>Esta ecuación lleva una distribución inicial <span
+class="math inline">\(u(x, 0)\)</span> hacia el equilibrio. El estado
+final es la solución de la elíptica asociada (<span
+class="math inline">\(u_{xx} = 0\)</span>, una recta entre las
+temperaturas de los extremos). El calor es solo el ejemplo físico
+habitual, la misma ecuación modela la difusión de un contaminante o el
+transporte de momento por viscosidad. Numéricamente combina los dos
+mundos de los capítulos anteriores, <strong>diferencias finitas en el
+espacio</strong> (como en <a href="05-PVF.md">PVF</a>) + <strong>marcha
+en el tiempo</strong> (como en <a href="01-PVI.md">PVI</a>).</p>
+<p>Notación: <span class="math inline">\(h\)</span> = paso espacial,
+<span class="math inline">\(k\)</span> = paso temporal, <span
+class="math inline">\(u_{i,j} \approx u(x_i, t_j)\)</span> — convención
+de <a href="07-EDP.md">EDP</a>; aquí <span
+class="math inline">\(j\)</span> recorre el <em>tiempo</em>, no una
+segunda dirección espacial como en <a
+href="08-Elipticas.md">Elípticas</a>.</p>
 <hr />
 <h2 id="esquema-explícito-ftcs">Esquema explícito FTCS</h2>
-<p>Discretizando <span class="math inline">\(u_{xx}\)</span> con la diferencia centrada <span class="math inline">\(\mathcal{O}(h^2)\)</span> y <span class="math inline">\(u_t\)</span> con Euler hacia adelante <span class="math inline">\(\mathcal{O}(k)\)</span> se obtiene el esquema FTCS (<em>Forward Time, Centered Space</em>):</p>
-<p><span class="math display">\[\frac{u_{i,j+1} - u_{i,j}}{k} = D\,\frac{u_{i+1,j} - 2u_{i,j} + u_{i-1,j}}{h^2}\]</span></p>
-<p>Definiendo el <strong>número de malla</strong> <span class="math inline">\(r = D\,k/h^2\)</span>, la actualización es explícita y local:</p>
-<p><span class="math display">\[{\color{#d62728}u_{i,j+1}} = {\color{#1f77b4}u_{i,j}} + r\,\left({\color{#1f77b4}u_{i+1,j}} - 2{\color{#1f77b4}u_{i,j}} + {\color{#1f77b4}u_{i-1,j}}\right)\]</span></p>
+<p>Discretizando <span class="math inline">\(u_{xx}\)</span> con la
+diferencia centrada <span
+class="math inline">\(\mathcal{O}(h^2)\)</span> y <span
+class="math inline">\(u_t\)</span> con Euler hacia adelante <span
+class="math inline">\(\mathcal{O}(k)\)</span> se obtiene el esquema FTCS
+(<em>Forward Time, Centered Space</em>):</p>
+<p><span class="math display">\[\frac{u_{i,j+1} - u_{i,j}}{k} =
+D\,\frac{u_{i+1,j} - 2u_{i,j} + u_{i-1,j}}{h^2}\]</span></p>
+<p>Definiendo el <strong>número de malla</strong> <span
+class="math inline">\(r = D\,k/h^2\)</span>, la actualización es
+explícita y local:</p>
+<p><span class="math display">\[{\color{#d62728}u_{i,j+1}} =
+{\color{#1f77b4}u_{i,j}} + r\,\left({\color{#1f77b4}u_{i+1,j}} -
+2{\color{#1f77b4}u_{i,j}} +
+{\color{#1f77b4}u_{i-1,j}}\right)\]</span></p>
 <figure>
-<img src="figs/stencil_ftcs.png" alt="" /><figcaption>Stencil FTCS: el nodo <span class="math inline">\(u_{i,j+1}\)</span> de la capa siguiente se alimenta de los tres valores <span class="math inline">\(u_{i-1,j}\)</span>, <span class="math inline">\(u_{i,j}\)</span> y <span class="math inline">\(u_{i+1,j}\)</span> de la capa actual</figcaption>
+<img src="figs/stencil_ftcs.png"
+alt="Stencil FTCS: el nodo u_{i,j+1} de la capa siguiente se alimenta de los tres valores u_{i-1,j}, u_{i,j} y u_{i+1,j} de la capa actual" />
+<figcaption aria-hidden="true">Stencil FTCS: el nodo <span
+class="math inline">\(u_{i,j+1}\)</span> de la capa siguiente se
+alimenta de los tres valores <span
+class="math inline">\(u_{i-1,j}\)</span>, <span
+class="math inline">\(u_{i,j}\)</span> y <span
+class="math inline">\(u_{i+1,j}\)</span> de la capa actual</figcaption>
 </figure>
-<p>La evolución es una marcha por capas temporales — el mismo «paso a paso» de Euler en <a href="01-PVI.md">PVI</a>:</p>
+<p>La evolución es una marcha por capas temporales — el mismo «paso a
+paso» de Euler en <a href="01-PVI.md">PVI</a>:</p>
 <ul>
-<li>La <strong>condición inicial</strong> llena la capa <span class="math inline">\(j = 0\)</span> y todos los <span class="math inline">\(u_{i,0} = u(x_i, 0)\)</span> son conocidos.</li>
-<li>La fórmula produce la capa <span class="math inline">\(j + 1\)</span>. Cada <span class="math inline">\(u_{i,j+1}\)</span> se calcula sólo con los tres valores de la capa <span class="math inline">\(j\)</span>, el propio nodo y sus dos vecinos.</li>
-<li>En los extremos no se aplica la fórmula ya que las <strong>condiciones de contorno</strong> fijan su valor en cada capa.</li>
-<li>Precisión <span class="math inline">\(\mathcal{O}(k + h^2)\)</span> — primer orden en el tiempo, segundo en el espacio.</li>
+<li>La <strong>condición inicial</strong> llena la capa <span
+class="math inline">\(j = 0\)</span> y todos los <span
+class="math inline">\(u_{i,0} = u(x_i, 0)\)</span> son conocidos.</li>
+<li>La fórmula produce la capa <span class="math inline">\(j +
+1\)</span>. Cada <span class="math inline">\(u_{i,j+1}\)</span> se
+calcula sólo con los tres valores de la capa <span
+class="math inline">\(j\)</span>, el propio nodo y sus dos vecinos.</li>
+<li>En los extremos no se aplica la fórmula ya que las
+<strong>condiciones de contorno</strong> fijan su valor en cada
+capa.</li>
+<li>Precisión <span class="math inline">\(\mathcal{O}(k + h^2)\)</span>
+— primer orden en el tiempo, segundo en el espacio.</li>
 </ul>
 <h3 id="ejemplo-guía">Ejemplo guía</h3>
 <p>Resolver</p>
 <p><span class="math display">\[u_t = u_{xx}\]</span></p>
-<p>con condición inicial <span class="math inline">\(u(x,0) = \sin(\pi x)\)</span> y condiciones de contorno <span class="math inline">\(u(0,t) = u(1,t) = 0\)</span>.</p>
-<p>Sobre la malla <span class="math inline">\((x, t)\)</span> con <span class="math inline">\(h = 0.25\)</span> y <span class="math inline">\(k = 0.03125\)</span> (es decir, <span class="math inline">\(r = k/h^2 = 1/2\)</span>), el esquema solo recibe <strong>datos en los bordes</strong> y calcula todo lo demás:</p>
+<p>con condición inicial <span class="math inline">\(u(x,0) = \sin(\pi
+x)\)</span> y condiciones de contorno <span class="math inline">\(u(0,t)
+= u(1,t) = 0\)</span>.</p>
+<p>Sobre la malla <span class="math inline">\((x, t)\)</span> con <span
+class="math inline">\(h = 0.25\)</span> y <span class="math inline">\(k
+= 0.03125\)</span> (es decir, <span class="math inline">\(r = k/h^2 =
+1/2\)</span>), el esquema solo recibe <strong>datos en los
+bordes</strong> y calcula todo lo demás:</p>
 <ul>
-<li>La <strong>fila <span class="math inline">\(j = 0\)</span> (condición inicial)</strong> es conocida por completo — <span class="math inline">\(u_{i,0} = \sin(\pi x_i)\)</span>, es decir <span class="math inline">\((0,\; 0.7071,\; 1,\; 0.7071,\; 0)\)</span>.</li>
-<li>Las <strong>columnas <span class="math inline">\(i = 0\)</span> e <span class="math inline">\(i = 4\)</span> (contorno)</strong> valen <span class="math inline">\(u_{0,j} = u_{4,j} = 0\)</span> en todos los niveles.</li>
-<li>En el <strong>interior</strong>, cada <span class="math inline">\(u_{i,j+1}\)</span> se calcula con la terna <span class="math inline">\(u_{i-1,j},\; u_{i,j},\; u_{i+1,j}\)</span> del nivel anterior — la malla se rellena fila por fila, hacia tiempos crecientes.</li>
+<li>La <strong>fila <span class="math inline">\(j = 0\)</span>
+(condición inicial)</strong> es conocida por completo — <span
+class="math inline">\(u_{i,0} = \sin(\pi x_i)\)</span>, es decir <span
+class="math inline">\((0,\; 0.7071,\; 1,\; 0.7071,\; 0)\)</span>.</li>
+<li>Las <strong>columnas <span class="math inline">\(i = 0\)</span> e
+<span class="math inline">\(i = 4\)</span> (contorno)</strong> valen
+<span class="math inline">\(u_{0,j} = u_{4,j} = 0\)</span> en todos los
+niveles.</li>
+<li>En el <strong>interior</strong>, cada <span
+class="math inline">\(u_{i,j+1}\)</span> se calcula con la terna <span
+class="math inline">\(u_{i-1,j},\; u_{i,j},\; u_{i+1,j}\)</span> del
+nivel anterior — la malla se rellena fila por fila, hacia tiempos
+crecientes.</li>
 </ul>
 <figure>
-<img src="figs/difusion_superficie.png" alt="" /><figcaption>Superficie exacta u(x,t) semitransparente con la solución FTCS (r = 1/2) superpuesta como malla de puntos. El borde t = 0 (condición inicial) y los laterales x = 0, 1 (contorno) son los datos; el interior es lo que el esquema calcula</figcaption>
+<img src="figs/difusion_superficie.png"
+alt="Superficie exacta u(x,t) semitransparente con la solución FTCS (r = 1/2) superpuesta como malla de puntos. El borde t = 0 (condición inicial) y los laterales x = 0, 1 (contorno) son los datos; el interior es lo que el esquema calcula" />
+<figcaption aria-hidden="true">Superficie exacta u(x,t) semitransparente
+con la solución FTCS (r = 1/2) superpuesta como malla de puntos. El
+borde t = 0 (condición inicial) y los laterales x = 0, 1 (contorno) son
+los datos; el interior es lo que el esquema calcula</figcaption>
 </figure>
-<p>La solución exacta <span class="math inline">\(u(x,t) = e^{-\pi^2 t}\sin(\pi x)\)</span> — una joroba que decae sin cambiar de forma — sirve de referencia para comparar lo que produce cada esquema.</p>
-<h3 id="estabilidad-la-condición-r-le-tfrac12">Estabilidad: la condición <span class="math inline">\(r \le \tfrac{1}{2}\)</span></h3>
-<p>El esquema FTCS es <strong>condicionalmente estable</strong>. El número de malla <span class="math inline">\(r = D\,k/h^2\)</span> de la actualización debe cumplir</p>
+<p>La solución exacta <span class="math inline">\(u(x,t) = e^{-\pi^2
+t}\sin(\pi x)\)</span> — una joroba que decae sin cambiar de forma —
+sirve de referencia para comparar lo que produce cada esquema.</p>
+<h3 id="estabilidad-la-condición-r-le-tfrac12">Estabilidad: la condición
+<span class="math inline">\(r \le \tfrac{1}{2}\)</span></h3>
+<p>El esquema FTCS es <strong>condicionalmente estable</strong>. El
+número de malla <span class="math inline">\(r = D\,k/h^2\)</span> de la
+actualización debe cumplir</p>
 <p><span class="math display">\[\boxed{r \le \frac{1}{2}}\]</span></p>
-<p>Es la misma idea que el límite <span class="math inline">\(h &lt; 2/\lambda\)</span> de Euler en <a href="03-Estabilidad.md">Estabilidad</a>, ahora aplicada a cada modo espacial de la discretización. Los modos de alta frecuencia en <span class="math inline">\(x\)</span> (los «dientes de sierra» entre nodos vecinos) son los que divergen primero. En la práctica esto obliga a <span class="math inline">\(k\)</span> del orden de <span class="math inline">\(h^2\)</span>. Hay que recordar que refinar la malla espacial a la mitad cuadruplica el número de pasos temporales.</p>
+<p>Es la misma idea que el límite <span class="math inline">\(h &lt;
+2/\lambda\)</span> de Euler en <a
+href="03-Estabilidad.md">Estabilidad</a>, ahora aplicada a cada modo
+espacial de la discretización. Los modos de alta frecuencia en <span
+class="math inline">\(x\)</span> (los «dientes de sierra» entre nodos
+vecinos) son los que divergen primero. En la práctica esto obliga a
+<span class="math inline">\(k\)</span> del orden de <span
+class="math inline">\(h^2\)</span>. Hay que recordar que refinar la
+malla espacial a la mitad cuadruplica el número de pasos temporales.</p>
 <p>La figura siguiente muestra el ejemplo guía en tres escenarios:</p>
 <figure>
-<img src="figs/difusion_ftcs_cn.png" alt="" /><figcaption>Tres paneles. FTCS con r = 1 diverge en oscilaciones crecientes; FTCS con r = 1/2 sigue a la exacta con error visible; Crank–Nicolson con r = 1 es estable y más preciso</figcaption>
+<img src="figs/difusion_ftcs_cn.png"
+alt="Tres paneles. FTCS con r = 1 diverge en oscilaciones crecientes; FTCS con r = 1/2 sigue a la exacta con error visible; Crank–Nicolson con r = 1 es estable y más preciso" />
+<figcaption aria-hidden="true">Tres paneles. FTCS con r = 1 diverge en
+oscilaciones crecientes; FTCS con r = 1/2 sigue a la exacta con error
+visible; Crank–Nicolson con r = 1 es estable y más preciso</figcaption>
 </figure>
 <ul>
-<li><strong>Izquierda — <span class="math inline">\(r = 1\)</span></strong> (<span class="math inline">\(k = 0.0625\)</span>, el doble del límite). En la figura se suma <span class="math inline">\(0.05\sin(3\pi x)\)</span> a la condición inicial para hacer visible lo que el redondeo introduce siempre. Ese modo crece un factor <span class="math inline">\(\approx -2.4\)</span> por paso — cambia de signo y más que duplica su amplitud — hasta dominar una solución que debería <em>decaer</em>. Oscilaciones crecientes y valores negativos son la firma de la inestabilidad.</li>
-<li><strong>Centro — <span class="math inline">\(r = 1/2\)</span></strong> (<span class="math inline">\(k = 0.03125\)</span>). La actualización se simplifica a <span class="math inline">\(u_{i,j+1}=\tfrac12(u_{i+1,j}+u_{i-1,j})\)</span>. Es estable en el límite, pero el modo alternante queda sin amortiguar y el error aún es visible (~10 %). Conviene usar <span class="math inline">\(r&lt;1/2\)</span> o un método temporal de mayor orden.</li>
-<li><strong>Derecha — Crank–Nicolson con <span class="math inline">\(r = 1\)</span>.</strong> El mismo paso que hace diverger a FTCS, resuelto de forma estable y más precisa por el método implícito de la sección siguiente.</li>
+<li><strong>Izquierda — <span class="math inline">\(r =
+1\)</span></strong> (<span class="math inline">\(k = 0.0625\)</span>, el
+doble del límite). En la figura se suma <span
+class="math inline">\(0.05\sin(3\pi x)\)</span> a la condición inicial
+para hacer visible lo que el redondeo introduce siempre. Ese modo crece
+un factor <span class="math inline">\(\approx -2.4\)</span> por paso —
+cambia de signo y más que duplica su amplitud — hasta dominar una
+solución que debería <em>decaer</em>. Oscilaciones crecientes y valores
+negativos son la firma de la inestabilidad.</li>
+<li><strong>Centro — <span class="math inline">\(r =
+1/2\)</span></strong> (<span class="math inline">\(k =
+0.03125\)</span>). La actualización se simplifica a <span
+class="math inline">\(u_{i,j+1}=\tfrac12(u_{i+1,j}+u_{i-1,j})\)</span>.
+Es estable en el límite, pero el modo alternante queda sin amortiguar y
+el error aún es visible (~10 %). Conviene usar <span
+class="math inline">\(r&lt;1/2\)</span> o un método temporal de mayor
+orden.</li>
+<li><strong>Derecha — Crank–Nicolson con <span class="math inline">\(r =
+1\)</span>.</strong> El mismo paso que hace diverger a FTCS, resuelto de
+forma estable y más precisa por el método implícito de la sección
+siguiente.</li>
 </ul>
 <hr />
 <h2 id="método-de-cranknicolson-cn">Método de Crank–Nicolson (CN)</h2>
-<p>El defecto de FTCS está en el tiempo. Euler adelante es solo <span class="math inline">\(\mathcal{O}(k)\)</span>. Crank–Nicolson evalúa la derivada espacial como <strong>promedio del instante viejo y el nuevo</strong> — la regla del trapecio en el tiempo.</p>
-<p><span class="math display">\[\frac{u_{i,j+1} - u_{i,j}}{k} = \frac{D}{2}\left[\frac{u_{i+1,j} - 2u_{i,j} + u_{i-1,j}}{h^2} + \frac{u_{i+1,j+1} - 2u_{i,j+1} + u_{i-1,j+1}}{h^2}\right]\]</span></p>
-<p>Reordenando, las incógnitas en <span class="math inline">\(t_{j+1}\)</span> quedan a la izquierda:</p>
-<p><span class="math display">\[-\frac{r}{2}\,{\color{#d62728}u_{i-1,j+1}} + (1+r)\,{\color{#d62728}u_{i,j+1}} - \frac{r}{2}\,{\color{#d62728}u_{i+1,j+1}} = \frac{r}{2}\,{\color{#1f77b4}u_{i-1,j}} + (1-r)\,{\color{#1f77b4}u_{i,j}} + \frac{r}{2}\,{\color{#1f77b4}u_{i+1,j}}\]</span></p>
+<p>El defecto de FTCS está en el tiempo. Euler adelante es solo <span
+class="math inline">\(\mathcal{O}(k)\)</span>. Crank–Nicolson evalúa la
+derivada espacial como <strong>promedio del instante viejo y el
+nuevo</strong> — la regla del trapecio en el tiempo.</p>
+<p><span class="math display">\[\frac{u_{i,j+1} - u_{i,j}}{k} =
+\frac{D}{2}\left[\frac{u_{i+1,j} - 2u_{i,j} + u_{i-1,j}}{h^2} +
+\frac{u_{i+1,j+1} - 2u_{i,j+1} + u_{i-1,j+1}}{h^2}\right]\]</span></p>
+<p>Reordenando, las incógnitas en <span
+class="math inline">\(t_{j+1}\)</span> quedan a la izquierda:</p>
+<p><span
+class="math display">\[-\frac{r}{2}\,{\color{#d62728}u_{i-1,j+1}} +
+(1+r)\,{\color{#d62728}u_{i,j+1}} -
+\frac{r}{2}\,{\color{#d62728}u_{i+1,j+1}} =
+\frac{r}{2}\,{\color{#1f77b4}u_{i-1,j}} +
+(1-r)\,{\color{#1f77b4}u_{i,j}} +
+\frac{r}{2}\,{\color{#1f77b4}u_{i+1,j}}\]</span></p>
 <figure>
-<img src="figs/stencil_cn.png" alt="" /><figcaption>Stencil de Crank–Nicolson. Los tres nodos de la capa <span class="math inline">\(j+1\)</span> se acoplan entre sí y con la capa <span class="math inline">\(j\)</span> y las incógnitas se resuelven juntas</figcaption>
+<img src="figs/stencil_cn.png"
+alt="Stencil de Crank–Nicolson. Los tres nodos de la capa j+1 se acoplan entre sí y con la capa j y las incógnitas se resuelven juntas" />
+<figcaption aria-hidden="true">Stencil de Crank–Nicolson. Los tres nodos
+de la capa <span class="math inline">\(j+1\)</span> se acoplan entre sí
+y con la capa <span class="math inline">\(j\)</span> y las incógnitas se
+resuelven juntas</figcaption>
 </figure>
-<p>El esquema es <strong>implícito</strong> porque cada ecuación acopla las tres incógnitas vecinas de la capa <span class="math inline">\(j+1\)</span> (las rojas de la fórmula). Ninguna se puede calcular por separado como en FTCS y hay que resolver <strong>toda la fila junta</strong>. No es, sin embargo, el sistema global como en el caso de las <a href="08-Elipticas.md">Elípticas</a> donde todas las incógnitas de la grilla se acoplaban de una vez. Aquí el sistema involucra solo <strong>una capa temporal por paso</strong> — se resuelve la fila <span class="math inline">\(j+1\)</span> y se marcha a la siguiente. Además es <strong>tridiagonal</strong> — cada ecuación solo toca los vecinos inmediatos, el mismo patrón local del MDF de <a href="05-PVF.md">PVF</a> — y se resuelve de forma sencilla. A cambio se obtiene:</p>
+<p>El esquema es <strong>implícito</strong> porque cada ecuación acopla
+las tres incógnitas vecinas de la capa <span
+class="math inline">\(j+1\)</span> (las rojas de la fórmula). Ninguna se
+puede calcular por separado como en FTCS y hay que resolver <strong>toda
+la fila junta</strong>. No es, sin embargo, el sistema global como en el
+caso de las <a href="08-Elipticas.md">Elípticas</a> donde todas las
+incógnitas de la grilla se acoplaban de una vez. Aquí el sistema
+involucra solo <strong>una capa temporal por paso</strong> — se resuelve
+la fila <span class="math inline">\(j+1\)</span> y se marcha a la
+siguiente. Además es <strong>tridiagonal</strong> — cada ecuación solo
+toca los vecinos inmediatos, el mismo patrón local del MDF de <a
+href="05-PVF.md">PVF</a> — y se resuelve de forma sencilla. A cambio se
+obtiene:</p>
 <ul>
-<li><p><strong>Estabilidad incondicional</strong> — no existe una cota superior de <span class="math inline">\(r\)</span> para evitar divergencia. Sin embargo, valores grandes pueden producir oscilaciones no físicas en modos de alta frecuencia.</p></li>
-<li><p><strong>Precisión <span class="math inline">\(\mathcal{O}(k^2 + h^2)\)</span></strong> — el paso temporal se elige por precisión, no por estabilidad.</p></li>
+<li><p><strong>Estabilidad incondicional</strong> — no existe una cota
+superior de <span class="math inline">\(r\)</span> para evitar
+divergencia. Sin embargo, valores grandes pueden producir oscilaciones
+no físicas en modos de alta frecuencia.</p></li>
+<li><p><strong>Precisión <span class="math inline">\(\mathcal{O}(k^2 +
+h^2)\)</span></strong> — el paso temporal se elige por precisión, no por
+estabilidad.</p></li>
 </ul>
-<h3 id="ejemplo-cranknicolson-con-r-1">Ejemplo: Crank–Nicolson con <span class="math inline">\(r = 1\)</span></h3>
+<h3 id="ejemplo-cranknicolson-con-r-1">Ejemplo: Crank–Nicolson con <span
+class="math inline">\(r = 1\)</span></h3>
 <p>Retomamos el ejemplo guía</p>
 <p><span class="math display">\[u_t = u_{xx}\]</span></p>
-<p>con condición inicial <span class="math inline">\(u(x,0) = \sin(\pi x)\)</span> y condiciones de contorno <span class="math inline">\(u(0,t) = u(1,t) = 0\)</span>. Lo resolvemos sobre la misma malla <span class="math inline">\(h = 0.25\)</span>, con tres nodos interiores de valores iniciales <span class="math inline">\(u_{1,0} = 0.7071\)</span>, <span class="math inline">\(u_{2,0} = 1\)</span>, <span class="math inline">\(u_{3,0} = 0.7071\)</span>, pero ahora con <span class="math inline">\(k = 0.0625\)</span>. El paso que hacía diverger a FTCS. Para referencia, la solución exacta es <span class="math inline">\(u(x,t) = e^{-\pi^2 t}\sin(\pi x)\)</span>.</p>
-<p>Con <span class="math inline">\(r = 1\)</span> el lado derecho se reduce a <span class="math inline">\(\tfrac{1}{2}(u_{i-1,j} + u_{i+1,j})\)</span> y cada paso resuelve el sistema</p>
-<p><span class="math display">\[\begin{bmatrix} 2 &amp; -0.5 &amp; 0 \\ -0.5 &amp; 2 &amp; -0.5 \\ 0 &amp; -0.5 &amp; 2 \end{bmatrix} \begin{bmatrix} u_{1,j+1} \\ u_{2,j+1} \\ u_{3,j+1} \end{bmatrix} = \frac{1}{2}\begin{bmatrix} u_{0,j} + u_{2,j} \\ u_{1,j} + u_{3,j} \\ u_{2,j} + u_{4,j} \end{bmatrix}\]</span></p>
-<p>La matriz es <strong>la misma en todos los pasos</strong>. Cada fila es la ecuación de un nodo interior y los coeficientes <span class="math inline">\(1+r\)</span> en la diagonal y <span class="math inline">\(-r/2\)</span> en las adyacentes no dependen ni de la posición ni del instante. Se factoriza una vez y se reutiliza en todos los pasos. Lo que cambia es el lado derecho, que se arma con los valores conocidos de la capa <span class="math inline">\(j\)</span>. Cuando un vecino cae en el borde su valor viene del contorno (aquí <span class="math inline">\(u_{0,j} = u_{4,j} = 0\)</span>).</p>
-<p>Tabla de Crank–Nicolson con los valores del nodo interior <span class="math inline">\(u_2\)</span> en diferentes tiempos:</p>
+<p>con condición inicial <span class="math inline">\(u(x,0) = \sin(\pi
+x)\)</span> y condiciones de contorno <span class="math inline">\(u(0,t)
+= u(1,t) = 0\)</span>. Lo resolvemos sobre la misma malla <span
+class="math inline">\(h = 0.25\)</span>, con tres nodos interiores de
+valores iniciales <span class="math inline">\(u_{1,0} = 0.7071\)</span>,
+<span class="math inline">\(u_{2,0} = 1\)</span>, <span
+class="math inline">\(u_{3,0} = 0.7071\)</span>, pero ahora con <span
+class="math inline">\(k = 0.0625\)</span>. El paso que hacía diverger a
+FTCS. Para referencia, la solución exacta es <span
+class="math inline">\(u(x,t) = e^{-\pi^2 t}\sin(\pi x)\)</span>.</p>
+<p>Con <span class="math inline">\(r = 1\)</span> el lado derecho se
+reduce a <span class="math inline">\(\tfrac{1}{2}(u_{i-1,j} +
+u_{i+1,j})\)</span> y cada paso resuelve el sistema</p>
+<p><span class="math display">\[\begin{bmatrix} 2 &amp; -0.5 &amp; 0 \\
+-0.5 &amp; 2 &amp; -0.5 \\ 0 &amp; -0.5 &amp; 2 \end{bmatrix}
+\begin{bmatrix} u_{1,j+1} \\ u_{2,j+1} \\ u_{3,j+1} \end{bmatrix} =
+\frac{1}{2}\begin{bmatrix} u_{0,j} + u_{2,j} \\ u_{1,j} + u_{3,j} \\
+u_{2,j} + u_{4,j} \end{bmatrix}\]</span></p>
+<p>La matriz es <strong>la misma en todos los pasos</strong>. Cada fila
+es la ecuación de un nodo interior y los coeficientes <span
+class="math inline">\(1+r\)</span> en la diagonal y <span
+class="math inline">\(-r/2\)</span> en las adyacentes no dependen ni de
+la posición ni del instante. Se factoriza una vez y se reutiliza en
+todos los pasos. Lo que cambia es el lado derecho, que se arma con los
+valores conocidos de la capa <span class="math inline">\(j\)</span>.
+Cuando un vecino cae en el borde su valor viene del contorno (aquí <span
+class="math inline">\(u_{0,j} = u_{4,j} = 0\)</span>).</p>
+<p>Tabla de Crank–Nicolson con los valores del nodo interior <span
+class="math inline">\(u_2\)</span> en diferentes tiempos:</p>
 <table>
 <thead>
 <tr class="header">
@@ -125,9 +304,17 @@
 </tbody>
 </table>
 <figure>
-<img src="figs/difusion_superficie_cn.png" alt="" /><figcaption>Superficie exacta <span class="math inline">\(u(x,t)\)</span> semitransparente con la solución Crank–Nicolson (<span class="math inline">\(r = 1\)</span>) superpuesta como malla de puntos. Cuatro capas temporales de paso <span class="math inline">\(k = 0.0625\)</span></figcaption>
+<img src="figs/difusion_superficie_cn.png"
+alt="Superficie exacta u(x,t) semitransparente con la solución Crank–Nicolson (r = 1) superpuesta como malla de puntos. Cuatro capas temporales de paso k = 0.0625" />
+<figcaption aria-hidden="true">Superficie exacta <span
+class="math inline">\(u(x,t)\)</span> semitransparente con la solución
+Crank–Nicolson (<span class="math inline">\(r = 1\)</span>) superpuesta
+como malla de puntos. Cuatro capas temporales de paso <span
+class="math inline">\(k = 0.0625\)</span></figcaption>
 </figure>
-<p>La solución obtenida por Crank–Nicolson es estable donde FTCS explotó y encima más preciso que el FTCS <em>estable</em> (error ~1.5% vs ~10%) y con la mitad de pasos.</p>
+<p>La solución obtenida por Crank–Nicolson es estable donde FTCS explotó
+y encima más preciso que el FTCS <em>estable</em> (error ~1.5% vs ~10%)
+y con la mitad de pasos.</p>
 <hr />
 <h2 id="comparación">Comparación</h2>
 <table>
@@ -146,8 +333,10 @@
 <tbody>
 <tr class="odd">
 <td>Actualización</td>
-<td><span class="math inline">\(u_{i,j+1}\)</span> directo de vecinos en <span class="math inline">\(t_j\)</span></td>
-<td>Sistema tridiagonal por paso (Thomas, <span class="math inline">\(\mathcal{O}(N)\)</span>)</td>
+<td><span class="math inline">\(u_{i,j+1}\)</span> directo de vecinos en
+<span class="math inline">\(t_j\)</span></td>
+<td>Sistema tridiagonal por paso (Thomas, <span
+class="math inline">\(\mathcal{O}(N)\)</span>)</td>
 </tr>
 <tr class="even">
 <td>Estabilidad</td>
@@ -161,8 +350,10 @@
 </tr>
 <tr class="even">
 <td>Coste por paso</td>
-<td><span class="math inline">\(\mathcal{O}(N)\)</span> aritmética pura</td>
-<td><span class="math inline">\(\mathcal{O}(N)\)</span> resolución de sistema</td>
+<td><span class="math inline">\(\mathcal{O}(N)\)</span> aritmética
+pura</td>
+<td><span class="math inline">\(\mathcal{O}(N)\)</span> resolución de
+sistema</td>
 </tr>
 <tr class="odd">
 <td>Análogo en EDO</td>
@@ -171,9 +362,22 @@
 </tr>
 </tbody>
 </table>
-<p>El patrón se repite, <strong>explícito = actualización directa con límite de estabilidad; implícito = sistema por paso sin ese límite</strong> — la misma conclusión de <a href="03-Estabilidad.md">Estabilidad</a> para EDO rígidas. La difusión es intrínsecamente «rígida» en el espacio donde los modos de alta frecuencia decaen muy rápido (<span class="math inline">\(e^{-D\beta^2 t}\)</span>) y son ellos los que fijan el techo <span class="math inline">\(r \le 1/2\)</span> del esquema explícito, aunque ya hayan desaparecido de la solución.</p>
+<p>El patrón se repite, <strong>explícito = actualización directa con
+límite de estabilidad; implícito = sistema por paso sin ese
+límite</strong> — la misma conclusión de <a
+href="03-Estabilidad.md">Estabilidad</a> para EDO rígidas. La difusión
+es intrínsecamente «rígida» en el espacio donde los modos de alta
+frecuencia decaen muy rápido (<span class="math inline">\(e^{-D\beta^2
+t}\)</span>) y son ellos los que fijan el techo <span
+class="math inline">\(r \le 1/2\)</span> del esquema explícito, aunque
+ya hayan desaparecido de la solución.</p>
 <blockquote>
-<p><strong>Comprueba tu comprensión.</strong> Para <span class="math inline">\(D = 1\)</span> y <span class="math inline">\(h = 0.1\)</span>, ¿cuál es el mayor <span class="math inline">\(k\)</span> permitido por FTCS? ¿Cuántos pasos hacen falta para llegar a <span class="math inline">\(t = 0.1\)</span> con FTCS y con CN a <span class="math inline">\(k = 0.01\)</span>?</p>
+<p><strong>Comprueba tu comprensión.</strong> Para <span
+class="math inline">\(D = 1\)</span> y <span class="math inline">\(h =
+0.1\)</span>, ¿cuál es el mayor <span class="math inline">\(k\)</span>
+permitido por FTCS? ¿Cuántos pasos hacen falta para llegar a <span
+class="math inline">\(t = 0.1\)</span> con FTCS y con CN a <span
+class="math inline">\(k = 0.01\)</span>?</p>
 </blockquote>
 <nav class="chapnav"><a class="prev" href="08-Elipticas.html">&larr; EDP Elípticas: Ecuación de Laplace</a><a class="index" href="index.html">&Iacute;ndice</a><span></span></nav>
 </body>
