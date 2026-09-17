@@ -8,32 +8,60 @@
   <style>
     code{white-space: pre-wrap;}
     span.smallcaps{font-variant: small-caps;}
-    span.underline{text-decoration: underline;}
-    div.column{display: inline-block; vertical-align: top; width: 50%;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
     div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
-    ul.task-list{list-style: none;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
   </style>
   <link rel="stylesheet" href="style.css" />
-  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" type="text/javascript"></script>
+  <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+  <script
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"
+  type="text/javascript"></script>
 </head>
 <body>
 <nav class="chapnav"><a class="prev" href="06-Autovalores.html">&larr; El método del disparo para problemas de autovalores</a><a class="index" href="index.html">&Iacute;ndice</a><a class="next" href="08-Elipticas.html">EDP Elípticas: Ecuación de Laplace &rarr;</a></nav>
 <nav id="TOC" role="doc-toc">
 <ul>
-<li><a href="#ecuaciones-en-derivadas-parciales-edp">Ecuaciones en Derivadas Parciales (EDP)</a>
+<li><a href="#ecuaciones-en-derivadas-parciales-edp"
+id="toc-ecuaciones-en-derivadas-parciales-edp">Ecuaciones en Derivadas
+Parciales (EDP)</a>
 <ul>
-<li><a href="#clasificación-de-las-edp-lineales-de-segundo-orden">Clasificación de las EDP lineales de segundo orden</a></li>
-<li><a href="#conexión-con-lo-que-ya-sabemos">Conexión con lo que ya sabemos</a></li>
-<li><a href="#discretización-y-notación">Discretización y notación</a></li>
+<li><a href="#clasificación-de-las-edp-lineales-de-segundo-orden"
+id="toc-clasificación-de-las-edp-lineales-de-segundo-orden">Clasificación
+de las EDP lineales de segundo orden</a></li>
+<li><a href="#conexión-con-lo-que-ya-sabemos"
+id="toc-conexión-con-lo-que-ya-sabemos">Conexión con lo que ya
+sabemos</a></li>
+<li><a href="#discretización-y-notación"
+id="toc-discretización-y-notación">Discretización y notación</a></li>
 </ul></li>
 </ul>
 </nav>
-<h1 id="ecuaciones-en-derivadas-parciales-edp">Ecuaciones en Derivadas Parciales (EDP)</h1>
-<p>Hasta aquí las incógnitas dependían de una sola variable (<span class="math inline">\(y(x)\)</span>). Cuando la incógnita depende de <strong>dos o más variables</strong> — posición y tiempo, o varias coordenadas espaciales — las derivadas son parciales y hablamos de <strong>ecuaciones en derivadas parciales (EDP)</strong>.</p>
-<h2 id="clasificación-de-las-edp-lineales-de-segundo-orden">Clasificación de las EDP lineales de segundo orden</h2>
+<h1 id="ecuaciones-en-derivadas-parciales-edp">Ecuaciones en Derivadas
+Parciales (EDP)</h1>
+<p>Hasta aquí las incógnitas dependían de una sola variable (<span
+class="math inline">\(y(x)\)</span>). Cuando la incógnita depende de
+<strong>dos o más variables</strong> — posición y tiempo, o varias
+coordenadas espaciales — las derivadas son parciales y hablamos de
+<strong>ecuaciones en derivadas parciales (EDP)</strong>.</p>
+<h2
+id="clasificación-de-las-edp-lineales-de-segundo-orden">Clasificación de
+las EDP lineales de segundo orden</h2>
 <p>La EDP lineal de segundo orden más general en dos variables es</p>
-<p><span class="math display">\[A\,u_{xx} + B\,u_{xy} + C\,u_{yy} + P\,u_x + Q\,u_y + F\,u = G\]</span></p>
-<p>Su tipo lo decide el <strong>discriminante</strong> <span class="math inline">\(B^2 - 4AC\)</span>, igual que la ecuación cuadrática:</p>
+<p><span class="math display">\[A\,u_{xx} + B\,u_{xy} + C\,u_{yy} +
+P\,u_x + Q\,u_y + F\,u = G\]</span></p>
+<p>Su tipo lo decide el <strong>discriminante</strong> <span
+class="math inline">\(B^2 - 4AC\)</span>, igual que la ecuación
+cuadrática:</p>
 <table>
 <colgroup>
 <col style="width: 20%" />
@@ -55,7 +83,8 @@
 <tr class="odd">
 <td><span class="math inline">\(B^2 - 4AC &lt; 0\)</span></td>
 <td><strong>Elíptica</strong></td>
-<td>Laplace: <span class="math inline">\(u_{xx} + u_{yy} = 0\)</span></td>
+<td>Laplace: <span class="math inline">\(u_{xx} + u_{yy} =
+0\)</span></td>
 <td>Temperatura de equilibrio en una placa, potencial eléctrico</td>
 <td>Condiciones de contorno en <em>todo</em> el borde</td>
 </tr>
@@ -64,36 +93,85 @@
 <td><strong>Parabólica</strong></td>
 <td>Difusión: <span class="math inline">\(u_t = D\,u_{xx}\)</span></td>
 <td>Calor difundiéndose en una barra, difusión de contaminante</td>
-<td>Condición inicial + contorno en <span class="math inline">\(x\)</span></td>
+<td>Condición inicial + contorno en <span
+class="math inline">\(x\)</span></td>
 </tr>
 <tr class="odd">
 <td><span class="math inline">\(B^2 - 4AC &gt; 0\)</span></td>
 <td><strong>Hiperbólica</strong></td>
 <td>Ondas: <span class="math inline">\(u_{tt} = c^2 u_{xx}\)</span></td>
 <td>Cuerda vibrante, propagación de ondas</td>
-<td>Dos condiciones iniciales (<span class="math inline">\(u\)</span> y <span class="math inline">\(u_t\)</span>) + contorno</td>
+<td>Dos condiciones iniciales (<span class="math inline">\(u\)</span> y
+<span class="math inline">\(u_t\)</span>) + contorno</td>
 </tr>
 </tbody>
 </table>
-<p><em>Comprobación:</em> para Laplace, <span class="math inline">\(A = C = 1\)</span>, <span class="math inline">\(B = 0\)</span> → <span class="math inline">\(-4 &lt; 0\)</span>; para difusión (<span class="math inline">\(A = 1\)</span> en <span class="math inline">\(x\)</span>, <span class="math inline">\(C = 0\)</span> en <span class="math inline">\(t\)</span>) → <span class="math inline">\(0\)</span>; para ondas (<span class="math inline">\(A = 1\)</span>, <span class="math inline">\(C = -c^2\)</span>) → <span class="math inline">\(4c^2 &gt; 0\)</span>.</p>
-<h2 id="conexión-con-lo-que-ya-sabemos">Conexión con lo que ya sabemos</h2>
-<p>La clasificación no es solo taxonomía, <strong>determina la estrategia numérica</strong>.</p>
+<p><em>Comprobación:</em> para Laplace, <span class="math inline">\(A =
+C = 1\)</span>, <span class="math inline">\(B = 0\)</span> → <span
+class="math inline">\(-4 &lt; 0\)</span>; para difusión (<span
+class="math inline">\(A = 1\)</span> en <span
+class="math inline">\(x\)</span>, <span class="math inline">\(C =
+0\)</span> en <span class="math inline">\(t\)</span>) → <span
+class="math inline">\(0\)</span>; para ondas (<span
+class="math inline">\(A = 1\)</span>, <span class="math inline">\(C =
+-c^2\)</span>) → <span class="math inline">\(4c^2 &gt; 0\)</span>.</p>
+<h2 id="conexión-con-lo-que-ya-sabemos">Conexión con lo que ya
+sabemos</h2>
+<p>La clasificación no es solo taxonomía, <strong>determina la
+estrategia numérica</strong>.</p>
 <ul>
-<li><strong>Elípticas</strong> ≈ <strong>PVF</strong>: la información está en los bordes, todas las incógnitas se resuelven a la vez como un sistema global (el MDF de <a href="05-PVF.md">PVF</a>, ahora en malla 2D). Lo vemos en <a href="08-Elipticas.md">EDP elípticas</a>.</li>
-<li><strong>Parabólicas e hiperbólicas</strong> ≈ <strong>PVI en el tiempo + PVF en el espacio</strong>: se discretiza el espacio con diferencias finitas y se marcha en <span class="math inline">\(t\)</span> con esquemas de Euler o similares. La estabilidad del paso temporal vuelve a ser el tema central (<a href="03-Estabilidad.md">Estabilidad</a>). Lo vemos en <a href="09-Parabolicas.md">Parabólicas</a>.</li>
+<li><strong>Elípticas</strong> ≈ <strong>PVF</strong>: la información
+está en los bordes, todas las incógnitas se resuelven a la vez como un
+sistema global (el MDF de <a href="05-PVF.md">PVF</a>, ahora en malla
+2D). Lo vemos en <a href="08-Elipticas.md">EDP elípticas</a>.</li>
+<li><strong>Parabólicas e hiperbólicas</strong> ≈ <strong>PVI en el
+tiempo + PVF en el espacio</strong>: se discretiza el espacio con
+diferencias finitas y se marcha en <span
+class="math inline">\(t\)</span> con esquemas de Euler o similares. La
+estabilidad del paso temporal vuelve a ser el tema central (<a
+href="03-Estabilidad.md">Estabilidad</a>). Lo vemos en <a
+href="09-Parabolicas.md">Parabólicas</a>.</li>
 </ul>
 <h2 id="discretización-y-notación">Discretización y notación</h2>
-<p>En los capítulos siguientes la idea es siempre la misma, el continuo se reemplaza por una <strong>malla</strong> de puntos y la EDP por una ecuación algebraica en cada nodo.</p>
+<p>En los capítulos siguientes la idea es siempre la misma, el continuo
+se reemplaza por una <strong>malla</strong> de puntos y la EDP por una
+ecuación algebraica en cada nodo.</p>
 <figure>
-<img src="figs/malla_notacion.png" alt="" /><figcaption>Malla uniforme con nodos etiquetados <span class="math inline">\(u_{i,j}\)</span>. Los índices <span class="math inline">\(i\)</span>, <span class="math inline">\(j\)</span> recorren las dos variables independientes con pasos <span class="math inline">\(h\)</span> y <span class="math inline">\(k\)</span></figcaption>
+<img src="figs/malla_notacion.png"
+alt="Malla uniforme con nodos etiquetados u_{i,j}. Los índices i, j recorren las dos variables independientes con pasos h y k" />
+<figcaption aria-hidden="true">Malla uniforme con nodos etiquetados
+<span class="math inline">\(u_{i,j}\)</span>. Los índices <span
+class="math inline">\(i\)</span>, <span class="math inline">\(j\)</span>
+recorren las dos variables independientes con pasos <span
+class="math inline">\(h\)</span> y <span
+class="math inline">\(k\)</span></figcaption>
 </figure>
 <ul>
-<li><strong>Malla:</strong> nodos equiespaciados — <span class="math inline">\(x_i = i\,h\)</span> en el espacio; la segunda dirección es <span class="math inline">\(t_j = j\,k\)</span> en las parabólicas y <span class="math inline">\(y_j = j\,h\)</span> en las elípticas (malla cuadrada).</li>
-<li><strong>Incógnitas:</strong> <span class="math inline">\(u_{i,j}\)</span> es el valor <em>calculado</em> por el esquema en el nodo. Escribimos <span class="math inline">\(u_{i,j} \approx u(x_i, t_j)\)</span> — o <span class="math inline">\(u(x_i, y_j)\)</span> en elípticas — con <span class="math inline">\(\approx\)</span>, no <span class="math inline">\(=\)</span>, porque difiere de la solución exacta en el error de truncamiento del método.</li>
-<li><strong>Stencil:</strong> cada ecuación discreta acopla un nodo con unos pocos vecinos; cuáles entran depende de la EDP — la cruz de cinco puntos de Laplace en <a href="08-Elipticas.md">Elípticas</a>, la terna de la capa temporal anterior en <a href="09-Parabolicas.md">Parabólicas</a>.</li>
+<li><strong>Malla:</strong> nodos equiespaciados — <span
+class="math inline">\(x_i = i\,h\)</span> en el espacio; la segunda
+dirección es <span class="math inline">\(t_j = j\,k\)</span> en las
+parabólicas y <span class="math inline">\(y_j = j\,h\)</span> en las
+elípticas (malla cuadrada).</li>
+<li><strong>Incógnitas:</strong> <span
+class="math inline">\(u_{i,j}\)</span> es el valor <em>calculado</em>
+por el esquema en el nodo. Escribimos <span
+class="math inline">\(u_{i,j} \approx u(x_i, t_j)\)</span> — o <span
+class="math inline">\(u(x_i, y_j)\)</span> en elípticas — con <span
+class="math inline">\(\approx\)</span>, no <span
+class="math inline">\(=\)</span>, porque difiere de la solución exacta
+en el error de truncamiento del método.</li>
+<li><strong>Stencil:</strong> cada ecuación discreta acopla un nodo con
+unos pocos vecinos; cuáles entran depende de la EDP — la cruz de cinco
+puntos de Laplace en <a href="08-Elipticas.md">Elípticas</a>, la terna
+de la capa temporal anterior en <a
+href="09-Parabolicas.md">Parabólicas</a>.</li>
 </ul>
 <blockquote>
-<p><strong>Mirando adelante.</strong> En un esquema explícito típico para ondas, la condición <strong>CFL</strong> <span class="math inline">\(c\,k/h\le1\)</span> exige que una onda no recorra más de una celda espacial durante un paso temporal. No desarrollaremos aquí las EDP hiperbólicas.</p>
+<p><strong>Mirando adelante.</strong> En un esquema explícito típico
+para ondas, la condición <strong>CFL</strong> <span
+class="math inline">\(c\,k/h\le1\)</span> exige que una onda no recorra
+más de una celda espacial durante un paso temporal. No desarrollaremos
+aquí las EDP hiperbólicas.</p>
 </blockquote>
 <nav class="chapnav"><a class="prev" href="06-Autovalores.html">&larr; El método del disparo para problemas de autovalores</a><a class="index" href="index.html">&Iacute;ndice</a><a class="next" href="08-Elipticas.html">EDP Elípticas: Ecuación de Laplace &rarr;</a></nav>
 </body>

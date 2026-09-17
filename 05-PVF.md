@@ -5,16 +5,15 @@ Un **Problema de Valores de Frontera (PVF)** proporciona condiciones en **dos o 
 * **Intuición:** piensa en la distribución de temperatura a lo largo de una barra metálica. Conoces la temperatura en el extremo izquierdo $y(a)$ y en el derecho $y(b)$, y debes encontrar una distribución que conecte ambos extremos fijados.
 
 * **Forma general (2º orden):**
-
 $$y'' = f(x, y, y'), \quad \text{con } y(a) = \alpha \text{ e } y(b) = \beta$$
 
 ---
 
 ## Por qué los PVF son difíciles
 
-En un PVI todas las condiciones se dan en el *mismo* punto inicial $x = a$ — conoces tanto $y(a)$ como $y'(a)$, así que puedes empezar a marchar de inmediato. Un PVF reparte esa información entre dos extremos, conoces $y(a) = \alpha$ a la izquierda, pero la pendiente $y'(a)$ es **desconocida**. Sin la pendiente no se puede iniciar una integración hacia adelante — y aunque adivinaras una, no sabrías si la adivinanza era correcta hasta llegar al extremo lejano $x = b$ y comprobarla contra $\beta$.
+En un PVI todas las condiciones se dan en el *mismo* punto inicial $x = a$ — se conoce tanto $y(a)$ como $y'(a)$, así que se puede empezar a marchar de inmediato. Un PVF reparte esa información entre dos extremos, se conoce $y(a) = \alpha$ a la izquierda, pero la pendiente $y'(a)$ es **desconocida**. Sin la pendiente no se puede iniciar una integración hacia adelante — y aunque se adivinara una, no se sabría si la adivinanza era correcta hasta llegar al extremo lejano $x = b$ y comprobarla contra $\beta$.
 
-Este es el obstáculo fundamental ya que **la información necesaria para empezar a marchar está repartida por el dominio**, de modo que ningún pase hacia adelante puede resolver el problema directamente. Las dos estrategias numéricas de este capítulo son sendas respuestas a ese obstáculo:
+Este es el obstáculo fundamental ya que **la información necesaria para empezar a marchar está repartida por el dominio** en los PVF, de modo que ningún pase hacia adelante puede resolver el problema directamente. Las dos estrategias numéricas de este capítulo son sendas respuestas a ese obstáculo:
 
 * **Disparo** — adivinar la pendiente desconocida, marchar, comprobar el borde lejano y refinar la adivinanza iterativamente.
 * **Diferencias Finitas (MDF)** — abandonar la marcha por completo; discretizar todo el dominio de una vez y resolver un sistema lineal acoplado para todos los puntos simultáneamente.
@@ -89,7 +88,7 @@ es decir, el valor de la pendiente inicial que hace que la solución del PVI lle
 
 ### Ejemplo resuelto: disparo sobre $y'' = y$
 
-Aplicamos el método del disparo a nuestro ejemplo guía $y'' = y$, $y(0) = 0$, $y(1) = 1$. Cada disparo será una integración con Euler adelante de paso $h = 0.5$ (dos pasos), grosero a propósito para poder hacer toda la cuenta a mano.
+Aplicamos el método del disparo a nuestro ejemplo guía $y'' = y$, $y(0) = 0$, $y(1) = 1$. Cada disparo será una integración con Euler adelante de paso $h = 0.5$, grosero a propósito para poder hacer toda la cuenta a mano.
 
 **Pasos 1–2: el PVI parametrizado.** Con $u_1 = y$, $u_2 = y'$:
 
@@ -197,21 +196,15 @@ $$y_{i-1} - 2.0625\,y_i + y_{i+1} = 0$$
 
 **Escribir las ecuaciones en cada nodo interior** ($i = 1, 2, 3$), sustituyendo los valores de contorno conocidos $y_0 = 0$ e $y_4 = 1$:
 
-* $i = 1$: $\quad y_0 - 2.0625\,y_1 + y_2 = 0 \implies -2.0625\,y_1 + y_2 = 0$
-* $i = 2$: $\quad y_1 - 2.0625\,y_2 + y_3 = 0$
-* $i = 3$: $\quad y_2 - 2.0625\,y_3 + y_4 = 0 \implies y_2 - 2.0625\,y_3 = -1$
+* $i = 1$: $\quad y_0 - 2.0625\,y_1 + y_2 = 0 \implies -2.0625\,y_1 + y_2 + 0\,y_3= 0$
+* $i = 2$: $\quad y_1 - 2.0625\,y_2 + y_3 = 0 \implies y_1 - 2.0625\,y_2 + y_3 = 0$
+* $i = 3$: $\quad y_2 - 2.0625\,y_3 + y_4 = 0 \implies 0\,y_1 + y_2 - 2.0625\,y_3 = -1$
 
 **Ensamblar el sistema tridiagonal** $A\mathbf{y} = \mathbf{b}$. Los valores de contorno $y_0 = 0$ e $y_4 = 1$ son *conocidos*, así que no aparecen como incógnitas; en su lugar $y_4 = 1$ pasa al lado derecho de la última ecuación:
 
 $$\begin{bmatrix} -2.0625 & 1 & 0 \\ 1 & -2.0625 & 1 \\ 0 & 1 & -2.0625 \end{bmatrix} \begin{bmatrix} y_1 \\ y_2 \\ y_3 \end{bmatrix} = \begin{bmatrix} 0 \\ 0 \\ -1 \end{bmatrix}$$
 
-**Resolver por sustitución progresiva** (algoritmo de Thomas):
-
-* De la fila 1: $y_2 = 2.0625\,y_1$
-* De la fila 2: $y_3 = 2.0625\,y_2 - y_1 = (2.0625^2 - 1)\,y_1 = 3.2539\,y_1$
-* De la fila 3: $y_2 - 2.0625\,y_3 = -1 \implies 2.0625\,y_1 - 2.0625 \times 3.2539\,y_1 = -1 \implies y_1 \approx 0.2151$
-
-Luego $y_2 \approx 0.4437$ e $y_3 \approx 0.7000$.
+Resolviendo por sustitución progresiva obtenemos $y_1 \approx 0.2151$, $y_2 \approx 0.4437$ e $y_3 \approx 0.7000$.
 
 **Comparar con la solución exacta** $y(x) = \sinh(x)/\sinh(1)$:
 
@@ -222,6 +215,8 @@ Luego $y_2 \approx 0.4437$ e $y_3 \approx 0.7000$.
 | 0.75 | 0.7000 | 0.6997 | 0.0002 |
 
 Los errores son del orden de $10^{-4}$, coherentes con la precisión $\mathcal{O}(h^2)$ del esquema centrado.
+
+![El ejemplo del MDF. Arriba, la malla 1D: los valores de borde $y_0=0$ e $y_4=1$ son datos conocidos (azul) y $y_1, y_2, y_3$ son las incógnitas (rojo); el stencil de 3 puntos acopla cada nodo interior con sus vecinos, que es el origen de la matriz tridiagonal. Abajo, los nodos MDF sobre la solución exacta —caen prácticamente encima de la curva, con error del orden de $10^{-4}$—, junto con el disparo de Euler $s_3=1$ de la sección anterior como referencia del error del integrador.](figs/mdf_ejemplo.png)
 
 ---
 

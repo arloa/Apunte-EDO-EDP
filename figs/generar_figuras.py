@@ -85,7 +85,7 @@ def fig_rk_convergencia():
                               ("RK2 ($h^2$)", "rk2", "tab:orange"),
                               ("RK4 ($h^4$)", "rk4", "tab:green")]:
         e = [err(metodo, int(n)) for n in Ns]
-        ax.loglog(hs, e, "o-", color=c, label=nombre)
+        ax.loglog(hs, e, "o-", color=c, label=nombre, lw=4)
     for p, c in [(1, "tab:blue"), (2, "tab:orange"), (4, "tab:green")]:
         ax.loglog(hs, hs ** p * 0.15, ":", color=c, alpha=0.6)
     ax.set_xlabel("$h$"); ax.set_ylabel("error global en $x=1$")
@@ -466,10 +466,98 @@ def fig_disparo_F():
     ax.axhline(0, color="k", lw=0.8)
     ax.set_xlabel("$s$"); ax.set_ylabel("$F(s)$")
     ax.set_title("El residuo del disparo: la secante halla la raíz de $F(s)$")
-    ax.legend(loc="lower right"); ax.grid(alpha=0.3)
+    ax.grid(alpha=0.3)
     fig.tight_layout(); fig.savefig(f"{FIGS}/disparo_F.png", dpi=150)
     plt.close(fig)
     return abs(s3 - 1.0) < 1e-12 and abs(s_star * np.sinh(1) - 1) < 1e-12
+
+
+def mdf_sistema(N=4):
+    # MDF sobre y''=y, y(0)=0, y(1)=1: ensambla el sistema tridiagonal
+    # y_i-1 - (2+h^2) y_i + y_i+1 = 0 (con y_N = 1 al lado derecho) y lo
+    # resuelve con el algoritmo de Thomas. Devuelve (x, y) con los N+1 nodos.
+    h = 1.0 / N
+    x = np.linspace(0, 1, N + 1)
+    a = np.full(N - 1, -1.0)          # subdiagonal
+    b = np.full(N - 1, 2 + h ** 2)    # diagonal
+    c = np.full(N - 1, -1.0)          # superdiagonal
+    d = np.zeros(N - 1)
+    d[-1] = 1.0                       # aporte del borde y_N = 1
+    cp = np.empty(N - 1); dp = np.empty(N - 1)
+    cp[0] = c[0] / b[0]; dp[0] = d[0] / b[0]
+    for i in range(1, N - 1):
+        m = b[i] - a[i] * cp[i - 1]
+        cp[i] = c[i] / m
+        dp[i] = (d[i] - a[i] * dp[i - 1]) / m
+    y = np.empty(N + 1)
+    y[0], y[-1] = 0.0, 1.0
+    y[-2] = dp[-1]
+    for i in range(N - 3, -1, -1):
+        y[i + 1] = dp[i] - cp[i] * y[i + 2]
+    return x, y
+
+
+def fig_mdf_ejemplo():
+    # 05-PVF: ejemplo resuelto del MDF sobre y''=y, y(0)=0, y(1)=1 con N=4,
+    # h=0.25. Panel (a): la malla 1D con el stencil de 3 puntos, con la
+    # convencion de las figuras de malla (borde = dato azul con su valor,
+    # incognita = circulo hueco rotulado, stencil verde). Panel (b): los
+    # nodos MDF sobre la solucion exacta, con el disparo Euler s3=1 de la
+    # seccion anterior como referencia del error del integrador.
+    x, y = mdf_sistema()
+    xf = np.linspace(0, 1, 300)
+
+    fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(6.4, 5.2),
+                                   gridspec_kw=dict(height_ratios=[1, 2]))
+
+    # ---- (a) la malla ----
+    ax1.axhline(0, color="gray", lw=0.8)
+    ax1.plot([x[1], x[3]], [0, 0], color="tab:green", lw=3, alpha=0.6,
+             zorder=2)                                 # stencil sobre y_2
+    for i, xi in enumerate(x):
+        if i in (0, len(x) - 1):
+            ax1.plot(xi, 0, "s", ms=10, color="tab:blue", zorder=3)
+            ax1.annotate(rf"$y_{i}$", (xi, 0), textcoords="offset points",
+                         xytext=(0, 9), ha="center", fontsize=9)
+            ax1.annotate(f"{int(y[i])}", (xi, 0), textcoords="offset points",
+                         xytext=(10 if i == 0 else -16, 3),
+                         fontsize=8, color="dimgray")
+        else:
+            ax1.plot(xi, 0, "o", ms=14, mfc="white", mec="tab:red", mew=1.5,
+                     zorder=3)
+            ax1.annotate(rf"$y_{i}$", (xi, 0), ha="center", va="center",
+                         fontsize=8, zorder=4)
+    ax1.annotate("", (x[1], -0.38), (x[0], -0.38),
+                 arrowprops=dict(arrowstyle="<->", color="dimgray", lw=1))
+    ax1.annotate("$h$", (0.125, -0.38), ha="center", va="top",
+                 textcoords="offset points", xytext=(0, -4), fontsize=10)
+    ax1.set_xlim(-0.16, 1.16); ax1.set_ylim(-0.58, 0.55)
+    ax1.axis("off")
+    ax1.set_title(r"Malla $h=0.25$: borde conocido, 3 incógnitas interiores")
+
+    # ---- (b) la solución ----
+    ax2.plot(xf, np.sinh(xf) / np.sinh(1), "k-", lw=2,
+             label=r"Exacta $\sinh(x)/\sinh(1)$")
+    ax2.plot(x, y, "o--", color="tab:red", label="MDF $N=4$")
+    ax2.plot(x[[0, -1]], y[[0, -1]], "s", ms=9, color="tab:blue", zorder=5)
+    xe, ye = disparo_euler(1.0)
+    ax2.plot(xe, ye, "o--", color="tab:green", ms=6,
+             label=r"Disparo Euler $s_3=1$")
+    ax2.axhline(1, color="k", lw=1, ls=":")
+    ax2.annotate(r"$\beta = 1$", (1, 1), textcoords="offset points",
+                 xytext=(-30, 8))
+    ax2.annotate(r"error máximo $\approx 3\times10^{-4}$", xy=(x[3], y[3]),
+                 xytext=(0.42, 0.85),
+                 arrowprops=dict(arrowstyle="->", lw=0.8, color="dimgray"))
+    ax2.set_xlabel("$x$"); ax2.set_ylabel("$y$")
+    ax2.set_title("MDF $N=4$ frente a la solución exacta")
+    ax2.legend(loc="upper left"); ax2.grid(alpha=0.3)
+
+    fig.tight_layout(); fig.savefig(f"{FIGS}/mdf_ejemplo.png", dpi=150)
+    plt.close(fig)
+    return (abs(y[1] - 0.2151) < 1e-4 and abs(y[2] - 0.4437) < 1e-4
+            and abs(y[3] - 0.7000) < 1e-4
+            and np.max(np.abs(y - np.sinh(x) / np.sinh(1))) < 5e-4)
 
 
 def disparo_psi(lam, h=0.005):
@@ -886,6 +974,7 @@ if __name__ == "__main__":
         ("disparo", fig_disparo),
         ("disparo_euler", fig_disparo_euler),
         ("disparo_F", fig_disparo_F),
+        ("mdf_ejemplo", fig_mdf_ejemplo),
         ("pvf_ejemplo", fig_pvf_ejemplo),
         ("autovalores_F", fig_autovalores_F),
         ("autovalores_disparo", fig_autovalores_disparo),

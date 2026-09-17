@@ -4,41 +4,72 @@
   <meta charset="utf-8" />
   <meta name="generator" content="pandoc" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
-  <title>M��todos Num��ricos para EDO y EDP</title>
+  <title>Métodos Numéricos para EDO y EDP</title>
   <style>
     code{white-space: pre-wrap;}
     span.smallcaps{font-variant: small-caps;}
-    span.underline{text-decoration: underline;}
-    div.column{display: inline-block; vertical-align: top; width: 50%;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
     div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
-    ul.task-list{list-style: none;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
   </style>
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
 <header id="title-block-header">
-<h1 class="title">M��todos Num��ricos para EDO y EDP</h1>
+<h1 class="title">Métodos Numéricos para EDO y EDP</h1>
 </header>
-<h1 id="métodos-numéricos-para-edo-y-edp">Métodos Numéricos para EDO y EDP</h1>
-<p>Apuntes del curso sobre métodos numéricos para ecuaciones diferenciales: problemas de valor inicial, métodos de Runge–Kutta, estabilidad, condiciones de contorno, problemas de valores de frontera y una introducción a ecuaciones en derivadas parciales.</p>
+<h1 id="métodos-numéricos-para-edo-y-edp">Métodos Numéricos para EDO y
+EDP</h1>
+<p>Apuntes del curso sobre métodos numéricos para ecuaciones
+diferenciales: problemas de valor inicial, métodos de Runge–Kutta,
+estabilidad, condiciones de contorno, problemas de valores de frontera y
+una introducción a ecuaciones en derivadas parciales.</p>
 <h2 id="contenido">Contenido</h2>
-<h3 id="parte-i-problemas-de-valor-inicial-marcha-paso-a-paso">Parte I — Problemas de Valor Inicial (marcha paso a paso)</h3>
+<h3 id="parte-i-problemas-de-valor-inicial-marcha-paso-a-paso">Parte I —
+Problemas de Valor Inicial (marcha paso a paso)</h3>
 <ol type="1">
-<li><strong><a href="01-PVI.html">Problemas de Valor Inicial (PVI)</a></strong> — Euler hacia adelante/atrás, sistemas de EDO, introducción al MDF</li>
-<li><strong><a href="02-RungeKutta.html">Métodos de Runge–Kutta</a></strong> — RK2, RK4, RK implícitos</li>
-<li><strong><a href="03-Estabilidad.html">Análisis de Estabilidad</a></strong> — estabilidad de Euler, ecuaciones rígidas</li>
+<li><strong><a href="01-PVI.html">Problemas de Valor Inicial
+(PVI)</a></strong> — Euler hacia adelante/atrás, sistemas de EDO,
+introducción al MDF</li>
+<li><strong><a href="02-RungeKutta.html">Métodos de
+Runge–Kutta</a></strong> — RK2, RK4, RK implícitos</li>
+<li><strong><a href="03-Estabilidad.html">Análisis de
+Estabilidad</a></strong> — estabilidad de Euler, ecuaciones rígidas</li>
 </ol>
-<h3 id="parte-ii-problemas-de-valores-de-frontera-resolución-global">Parte II — Problemas de Valores de Frontera (resolución global)</h3>
+<h3
+id="parte-ii-problemas-de-valores-de-frontera-resolución-global">Parte
+II — Problemas de Valores de Frontera (resolución global)</h3>
 <ol start="4" type="1">
-<li><strong><a href="04-CondicionesContorno.html">Condiciones de Contorno</a></strong> — Dirichlet, Neumann, Robin y su tratamiento numérico</li>
-<li><strong><a href="05-PVF.html">Problemas de Valores de Frontera (PVF)</a></strong> — método del disparo, MDF para PVF</li>
-<li><strong><a href="06-Autovalores.html">Problemas de Autovalores</a></strong> — método del disparo para autovalores, partícula en una caja</li>
+<li><strong><a href="04-CondicionesContorno.html">Condiciones de
+Contorno</a></strong> — Dirichlet, Neumann, Robin y su tratamiento
+numérico</li>
+<li><strong><a href="05-PVF.html">Problemas de Valores de Frontera
+(PVF)</a></strong> — método del disparo, MDF para PVF</li>
+<li><strong><a href="06-Autovalores.html">Problemas de
+Autovalores</a></strong> — método del disparo para autovalores,
+partícula en una caja</li>
 </ol>
-<h3 id="parte-iii-ecuaciones-en-derivadas-parciales-los-dos-mundos-combinados">Parte III — Ecuaciones en Derivadas Parciales (los dos mundos combinados)</h3>
+<h3
+id="parte-iii-ecuaciones-en-derivadas-parciales-los-dos-mundos-combinados">Parte
+III — Ecuaciones en Derivadas Parciales (los dos mundos combinados)</h3>
 <ol start="7" type="1">
-<li><strong><a href="07-EDP.html">Ecuaciones en Derivadas Parciales (EDP)</a></strong> — clasificación elípticas / parabólicas / hiperbólicas</li>
-<li><strong><a href="08-Elipticas.html">EDP Elípticas</a></strong> — ecuación de Laplace por MDF, método directo y Gauss–Seidel</li>
-<li><strong><a href="09-Parabolicas.html">EDP Parabólicas</a></strong> — ecuación de difusión, esquema explícito FTCS, estabilidad, Crank–Nicolson</li>
+<li><strong><a href="07-EDP.html">Ecuaciones en Derivadas Parciales
+(EDP)</a></strong> — clasificación elípticas / parabólicas /
+hiperbólicas</li>
+<li><strong><a href="08-Elipticas.html">EDP Elípticas</a></strong> —
+ecuación de Laplace por MDF, método directo y Gauss–Seidel</li>
+<li><strong><a href="09-Parabolicas.html">EDP Parabólicas</a></strong> —
+ecuación de difusión, esquema explícito FTCS, estabilidad,
+Crank–Nicolson</li>
 </ol>
 </body>
 </html>
