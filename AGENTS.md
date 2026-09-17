@@ -8,7 +8,10 @@ numerados en orden pedagógico, figuras PNG en `figs/`, HTML en `html/`.
 - **Regenerar figuras**: `uv run --with matplotlib --with numpy figs/generar_figuras.py`
   (cada función `fig_*` devuelve un check que se verifica con assert; agregar
   la función nueva a la lista `checks` del `__main__`).
-- **Regenerar HTML**: `./build_html.sh`
+- **Regenerar HTML**: `./build_html.sh` (sale a `html/`, preview local)
+- **Publicar (GitHub Pages)**: `./publish.sh` — corre `build_html.sh` y copia
+  el resultado a `docs/`, que es lo que Pages sirve. Commitear y pushear
+  `docs/` o el sitio público no refleja los cambios.
 
 ## Gotchas
 
